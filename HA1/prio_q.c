@@ -38,47 +38,53 @@ void prio_q_enqueue(struct prio_q *q, void *data, int prio)
 
 void * prio_q_dequeue(struct prio_q *q)
 {
-    if (q->front == NULL) //why isn't there {}
-        return; 
-    struct prio_q_elem * temp = q->front->data; // sollte nicht den Wert zurückgeben?
-  
-    q->front = q->front->next;
-    struct prio_q_elem * tmp = temp; //why? überflüssig?
+    if (q->front == NULL){
+        return NULL;
+	}
+	else{
+		struct prio_q_elem * temp = q->front;
+		struct prio_q_elem * tmp = q->front->data;
+
+		q->front = q->front->next;
+		free(temp);
+    	return tmp;
+	}
+    
 }
 
 
-// Still not the case of front = NULL covered!
 void * prio_q_front(struct prio_q *q)
 {
-	//if (q->front == NULL) warum funktioniert es nicht?
-    //	return;
-	struct prio_q_elem * front = q->front->data; // sollte nicht den Wert zurückgeben?
+	if (q->front == NULL){
+    	return NULL;
+	}
+	else{
+		return q->front->data;
+	}
+	
 }
 
-int prio_q_destroy(struct prio_q * q, void ** data) //is this a pointer to an array of pointers? 
+int prio_q_destroy(struct prio_q * q, void ** data)
 {
-	struct prio_q_elem * tmp = q->front;
-	int i = 0;
+	
+	int count = 0;
 
-	while (tmp->next != NULL){
-		if (tmp->data != NULL){
-			data[i] = tmp->data;
-			i++;
+	while (q->front != NULL){
+		struct prio_q_elem * tmp = q->front;
+		if (q->front->data != NULL){
+			data[count] = q->front->data;
+			count++;
 		}
-		tmp = tmp->next;
 		q->front = q->front->next;
-		
+		free(tmp);
 	}
-	printf("\nThe deleted data pointers:\n");
-	for (int j = 0; j < sizeof(data); j++){
-		printf("%p\n", data[j]);
-	}
-	return (data);
+
+	free(q);
+	return count;
 }
 
 void prio_q_print(struct prio_q * q, void (*print_data)(void*))
 {
-	// Implementierung dieser Funktion ist OPTIONAL und wird daher NICHT BEWERTET!
 	struct prio_q_elem * tmp = q->front;
 	printf("\n List Values: ");
 	// print data -> pointer auf data
