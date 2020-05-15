@@ -2,7 +2,7 @@
 
 struct prio_q * prio_q_create() 
 {
-	struct prio_q * q = malloc(sizeof(struct prio_q)); //Pointer q to initialized priority queue.
+	struct prio_q * q = malloc(sizeof(struct prio_q)); //Pointer q to initialized priority queue and allocates enough memory for it.
 	q->size = 0; 
 	q->front = NULL;
 	printf("\n Created Queue");
@@ -25,7 +25,7 @@ void prio_q_enqueue(struct prio_q *q, void *data, int prio)
 
 	else{ 
 		struct prio_q_elem * prev = q->front; 
-    	while(prev->next != NULL && prev->next->priority > elem->priority){ //slides the newly added element throught the queue until it reaches its correct position
+    	while(prev->next != NULL && prev->next->priority > elem->priority){ //slides the newly added element through the queue until it reaches its correct position
         	prev=prev->next;
 		}
 		struct prio_q_elem * tmp = prev->next;
@@ -41,11 +41,11 @@ void * prio_q_dequeue(struct prio_q *q)
         return NULL;
 	}
 	else{
-		struct prio_q_elem * temp = q->front; //!!!
-		struct prio_q_elem * tmp = q->front->data;
+		struct prio_q_elem * temp = q->front; //a temporary pointer to the front element 
+		struct prio_q_elem * tmp = q->front->data; //a pointer to the data of the front element
 
-		q->front = q->front->next;
-		free(temp);
+		q->front = q->front->next; //front pointer now points to the new front element
+		free(temp); //freeing the memory space that has been allocated to the old front element 
     	return tmp;
 	}
     
@@ -65,16 +65,16 @@ void * prio_q_front(struct prio_q *q)
 
 int prio_q_destroy(struct prio_q * q, void ** data)
 {
-	
+	//saving the data that was inside the queue in an array
 	int count = 0;
 
 	while (q->front != NULL){
-		struct prio_q_elem * tmp = q->front;///!!!
-		if (q->front->data != NULL){
+		struct prio_q_elem * tmp = q->front;	//a temporary pointer to the front element..
+		if (q->front->data != NULL){ 			//if the element contains data , its data pointer will be pointed to the array pointer
 			data[count] = q->front->data;
 			count++;
 		}
-		q->front = q->front->next;
+		q->front = q->front->next;				//slides the front pointer to the next element in every iteration.
 		free(tmp);
 	}
 
