@@ -56,10 +56,7 @@ pwd *crack_hash(char *hash) {
 	// Mit new_password() ein leeres Passwort anlegen
 	pwd *password = new_password(pwd_maxlen);
 	
-<<<<<<< HEAD
-=======
 	printf("%p", password);
->>>>>>> 47954979da7534a86e3f12cab97fd072cdb664a5
 	// Mit test_string() überprüfen, ob das (zuerst leere) Passwort zum Hash passt
 	// In einer Schleife next_password() aufrufen, und das nächste Passwort überprüfen
 	// Schleifenabbruch, sobald next_password() 0 zurückgibt => es gibt kein weiteres Passwort,
