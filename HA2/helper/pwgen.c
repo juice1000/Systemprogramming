@@ -2,16 +2,11 @@
 int next_pwd_internal(char *shifted_buffer, int remaining_buff_size);
 
 pwd *new_password(int maxlen) {
-<<<<<<< HEAD
-	// TODO
-	
-=======
 	pwd *passw = malloc(maxlen+1);
 	passw->buflen=maxlen+1;
 	passw->buf="";
 
 	return passw;
->>>>>>> 47954979da7534a86e3f12cab97fd072cdb664a5
 }
 
 /**
@@ -37,10 +32,7 @@ int next_pwd_internal(char *shifted_buffer, int remaining_buff_size) {
 		}
 	}
 	
-<<<<<<< HEAD
 	
-=======
->>>>>>> 47954979da7534a86e3f12cab97fd072cdb664a5
 	/**
 	 * Wenn der char in shifted_buffer[0] 0-8, oder a-y ist,
 	 * dann soll shifted_buffer[0] auf den entsprechend nächsten char gesetzt werden,
@@ -50,22 +42,12 @@ int next_pwd_internal(char *shifted_buffer, int remaining_buff_size) {
 	 *
 	 * Eine ASCII Tabelle kann Ihnen helfen.
 	*/
-<<<<<<< HEAD
 	if(shifted_buffer[0] != 'z' ||  shifted_buffer[0] != '9' || shifted_buffer[0] != '\0' ){
 		shifted_buffer[0] = shifted_buffer[0] + 1;
 		return 1;
 	}
 	
 	
-=======
-
-	if (shifted_buffer[0] >= 0 && shifted_buffer[0] < 9 || shifted_buffer[0] >= 'a' && shifted_buffer[0] < 'z'){
-		//shift value to next
-		shifted_buffer[0] = shifted_buffer[0]+1;
-		return 1;
-	}
-	
->>>>>>> 47954979da7534a86e3f12cab97fd072cdb664a5
 	/**
 	 * Wenn der char in shifted_buffer[0] ein z ist, dann soll
 	 * shifted_buffer[0] auf den character '0' gesetzt werden.
@@ -73,14 +55,9 @@ int next_pwd_internal(char *shifted_buffer, int remaining_buff_size) {
 	 *
 	 * Beenden Sie anschließend die Funktion mit Rückgabewert 1.
 	 */
-<<<<<<< HEAD
 	
 	if(shifted_buffer[0] == 'z'){
 		shifted_buffer[0] = '0';
-=======
-	if (shifted_buffer[0] == 'z'){
-		shifted_buffer[0] = 0;
->>>>>>> 47954979da7534a86e3f12cab97fd072cdb664a5
 		return 1;
 	}
 	
@@ -98,11 +75,7 @@ int next_pwd_internal(char *shifted_buffer, int remaining_buff_size) {
 }
 
 void free_password(pwd *thepwd) {
-<<<<<<< HEAD
-	// TODO
-=======
 	//TODO
 	
 	free(thepwd);
->>>>>>> 47954979da7534a86e3f12cab97fd072cdb664a5
 }
