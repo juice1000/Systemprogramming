@@ -12,12 +12,17 @@ int main(int argc, char *argv[]) {
 	
 	// Kommandozeilenargumente auslesen und globale und lokale Variablen füllen
 	// TODO: Vervollständigen
-	// pwd_maxlen = ...
-	// max_workers = ...
-	// filename = ...
+	pwd_maxlen = argv[1];
+	max_workers = argv[2];
+	filename = argv[3];
 	// worker = ...
 	// worker array mit 0 initialisieren
 	// TODO
+	pid_t *worker = malloc(sizeof(pid_t) * max_workers);
+	// worker array mit 0 initialisieren
+	for (int i = 0; i < max_workers; i++){
+		worker[i] = 0;
+	}
 	
 	INFO("\nBRUTEFORCER GESTARTET\n");
 	INFO("---------------------\n");
@@ -105,7 +110,14 @@ int update_worker() {
 	int n = 0;
 	for (int i = 0; i < max_workers; i++) {
 		// TODO
+		n = max_workers;
+		// check if process still running
+		// if finished
+		worker[i] = 0;
+		n = n -1;
+
 	}
 	
 	return n;
 }
+
