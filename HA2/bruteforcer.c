@@ -12,18 +12,18 @@ int main(int argc, char *argv[]) {
 	
 	// Kommandozeilenargumente auslesen und globale und lokale Variablen füllen
 	// TODO: Vervollständigen
-	pwd_maxlen = argv[1];
-	max_workers = argv[2];
+	int pwd_maxlen = (int) strtol(argv[1], (char **)NULL, 10);
+	int max_workers = (int) strtol(argv[1], (char **)NULL, 10);
 	filename = argv[3];
 
 	// worker = ...
 	// worker array mit 0 initialisieren
 	// TODO
-	pid_t *worker = malloc(sizeof(pid_t) * max_workers);
-	// worker array mit 0 initialisieren
-	for (int i = 0; i < max_workers; i++){
-		worker[i] = 0;
-	}
+	//pid_t *worker = malloc(sizeof(pid_t) * max_workers);
+	//// worker array mit 0 initialisieren
+	//for (int i = 0; i < max_workers; i++){
+	//	worker[i] = 0;
+	//}
 	
 	INFO("\nBRUTEFORCER GESTARTET\n");
 	INFO("---------------------\n");
@@ -42,14 +42,21 @@ int main(int argc, char *argv[]) {
 		
 		// Hash mit crack_hash versuchen zu knacken
 		// TODO
-		
+		if (crack_hash(hash) != NULL){
+			for (int i = 0; i < sizeof(loaded_hashes); i++){
+        		printf("%s\n",loaded_hashes->array[i]);
+    		}
+		}
+
 		// Erfolg? -> print password
 		// Fehlgeschlagen? -> Einfach weiter in der Schleife
 		
 	}
 	
+	
 	// Aufräumen und beenden
 	// TODO
+	free_hashes(loaded_hashes);
 	
 	return 0;
 }
@@ -60,7 +67,19 @@ int main(int argc, char *argv[]) {
 pwd *crack_hash(char *hash) {
 	// Mit new_password() ein leeres Passwort anlegen
 	pwd *password = new_password(pwd_maxlen);
+	test_string(password->buf, hash);
 	
+	while (next_password(password) != 0){
+		next_password(password);
+		password->buf = sha256(password->buf);
+		if (test_string(password->buf, hash) == 0){
+			return password;
+		}
+			
+
+	}
+		
+	return NULL;
 	// Mit test_string() überprüfen, ob das (zuerst leere) Passwort zum Hash passt
 	// In einer Schleife next_password() aufrufen, und das nächste Passwort überprüfen
 	// Schleifenabbruch, sobald next_password() 0 zurückgibt => es gibt kein weiteres Passwort,
@@ -75,11 +94,19 @@ pwd *crack_hash(char *hash) {
 	// Passwort nicht gefunden -> NULL zurückgeben
 	// Passwort gefunden -> das Password zurückgeben
 	// TODO
+	
 }
 
 // Berechnet den Hash von string und gibt 1 zurück, wenn er mit hash übereinstimmt, sonst 0
 int test_string(char *string, char *hash) {
-	// TODO
+	for (int i = 0; i < sizeof(string); i++){
+		if (string[i] != hash[i]){
+			//printf("FAILED");
+			return 1;
+		}
+	}
+	printf("SUCCESS");
+	return 0;
 }
 
 /**
