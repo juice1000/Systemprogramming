@@ -1,10 +1,15 @@
 #include "pwgen.h"
-int next_pwd_internal(char *shifted_buffer, int remaining_buff_size);
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 
 pwd *new_password(int maxlen) {
 	pwd *passw = malloc(maxlen+1);
 	passw->buflen=maxlen+1;
 	passw->buf="";
+
+    printf("Generated!");
 
 	return passw;
 }
@@ -77,4 +82,17 @@ void free_password(pwd *thepwd) {
 	//TODO
 	
 	free(thepwd);
+}
+
+
+int main(){
+    struct pwd pass;
+    pass.buf = 'a';
+    pass.buflen = 1;
+
+    printf("%p\n",new_password(pass.buflen));
+
+    //next_password( *pass);
+
+    return 0;
 }
