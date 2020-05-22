@@ -15,6 +15,7 @@ int main(int argc, char *argv[]) {
 	pwd_maxlen = argv[1];
 	max_workers = argv[2];
 	filename = argv[3];
+
 	// worker = ...
 	// worker array mit 0 initialisieren
 	// TODO
@@ -33,23 +34,8 @@ int main(int argc, char *argv[]) {
 	
 	// Hashes in ein hashes struct laden
 	// TODO
-	// loaded_hashes = ...
-	FILE *fp = fopen(filename,"r");
-    int i = 0;
-    char HASH[256];
-    char strs[100][256];
-    while(fgets(HASH, sizeof(HASH),fp)!= NULL){
-        loaded_hashes->array[i] = strcpy(strs[i],HASH);
-		strcpy(strs[i],HASH);
-        i++;
-        
-    }
+	loaded_hashes = load_hashes(filename);
 
-	char **array;
-	int len;
-	loaded_hashes = &strs;
-    //char *strs = loaded_hashes->array;
-    fclose(fp);
 	// Main loop -> Iteriert über alle Hashes
 	for (int i = 0; i < loaded_hashes->len; i++) {
 		char *hash = loaded_hashes->array[i];
