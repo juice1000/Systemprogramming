@@ -15,7 +15,8 @@ int main(int argc, char *argv[]) {
 	// pwd_maxlen = ...
 	// max_workers = ...
 	// filename = ...
-	
+	char filename[] = "";
+    scanf("%s",filename);
 	// worker = ...
 	// worker array mit 0 initialisieren
 	// TODO
@@ -30,7 +31,13 @@ int main(int argc, char *argv[]) {
 	// Hashes in ein hashes struct laden
 	// TODO
 	// loaded_hashes = ...
-	
+	FILE *fp = fopen(filename,"r");
+    char HASH[64];
+    while(fgets(HASH, sizeof(HASH),fp)!= NULL){
+        fputs(HASH,stdout);
+
+    }
+    fclose(fp);
 	// Main loop -> Iteriert über alle Hashes
 	for (int i = 0; i < loaded_hashes->len; i++) {
 		char *hash = loaded_hashes->array[i];
@@ -56,7 +63,6 @@ pwd *crack_hash(char *hash) {
 	// Mit new_password() ein leeres Passwort anlegen
 	pwd *password = new_password(pwd_maxlen);
 	
-	printf("%p", password);
 	// Mit test_string() überprüfen, ob das (zuerst leere) Passwort zum Hash passt
 	// In einer Schleife next_password() aufrufen, und das nächste Passwort überprüfen
 	// Schleifenabbruch, sobald next_password() 0 zurückgibt => es gibt kein weiteres Passwort,
