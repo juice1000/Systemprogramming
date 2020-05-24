@@ -1,10 +1,11 @@
 #include "pwgen.h"
+
 int next_pwd_internal(char *shifted_buffer, int remaining_buff_size);
 
 pwd *new_password(int maxlen) {
-	pwd *passw = malloc(maxlen+1);
+	pwd *passw = malloc(sizeof(pwd));
 	passw->buflen=maxlen+1;
-	passw->buf="";
+	passw->buf = malloc(sizeof(char)*maxlen);
 
 	return passw;
 }
@@ -32,7 +33,6 @@ int next_pwd_internal(char *shifted_buffer, int remaining_buff_size) {
 		}
 	}
 	
-	
 	/**
 	 * Wenn der char in shifted_buffer[0] 0-8, oder a-y ist,
 	 * dann soll shifted_buffer[0] auf den entsprechend nächsten char gesetzt werden,
@@ -42,11 +42,12 @@ int next_pwd_internal(char *shifted_buffer, int remaining_buff_size) {
 	 *
 	 * Eine ASCII Tabelle kann Ihnen helfen.
 	*/
-	if(shifted_buffer[0] != 'z' ||  shifted_buffer[0] != '9' || shifted_buffer[0] != '\0' ){
-		shifted_buffer[0] = shifted_buffer[0] + 1;
+
+	if ((shifted_buffer[0] >= '0' && shifted_buffer[0] < '9') || (shifted_buffer[0] >= 'a' && shifted_buffer[0] < 'z')){
+		//shift value to next
+		shifted_buffer[0] = shifted_buffer[0]+1;
 		return 1;
 	}
-	
 	
 	/**
 	 * Wenn der char in shifted_buffer[0] ein z ist, dann soll
@@ -55,8 +56,7 @@ int next_pwd_internal(char *shifted_buffer, int remaining_buff_size) {
 	 *
 	 * Beenden Sie anschließend die Funktion mit Rückgabewert 1.
 	 */
-	
-	if(shifted_buffer[0] == 'z'){
+	if (shifted_buffer[0] == 'z'){
 		shifted_buffer[0] = '0';
 		return 1;
 	}
@@ -75,7 +75,7 @@ int next_pwd_internal(char *shifted_buffer, int remaining_buff_size) {
 }
 
 void free_password(pwd *thepwd) {
-	//TODO
-	
+
+	free(thepwd->buf);
 	free(thepwd);
 }

@@ -2,14 +2,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
+int next_pwd_internal(char *shifted_buffer, int remaining_buff_size);
 
 pwd *new_password(int maxlen) {
-	pwd *passw = malloc(maxlen+1);
+	pwd *passw = malloc(sizeof(pwd));
 	passw->buflen=maxlen+1;
-	passw->buf="";
+	passw->buf = malloc(sizeof(char)*maxlen);
 
-    printf("Generated!");
+    printf("Generated!\n");
 
 	return passw;
 }
@@ -47,7 +49,7 @@ int next_pwd_internal(char *shifted_buffer, int remaining_buff_size) {
 	 * Eine ASCII Tabelle kann Ihnen helfen.
 	*/
 
-	if (shifted_buffer[0] >= 0 && shifted_buffer[0] < 9 || shifted_buffer[0] >= 'a' && shifted_buffer[0] < 'z'){
+	if ((shifted_buffer[0] >= '0' && shifted_buffer[0] < '9') || (shifted_buffer[0] >= 'a' && shifted_buffer[0] < 'z')){
 		//shift value to next
 		shifted_buffer[0] = shifted_buffer[0]+1;
 		return 1;
@@ -61,7 +63,7 @@ int next_pwd_internal(char *shifted_buffer, int remaining_buff_size) {
 	 * Beenden Sie anschließend die Funktion mit Rückgabewert 1.
 	 */
 	if (shifted_buffer[0] == 'z'){
-		shifted_buffer[0] = 0;
+		shifted_buffer[0] = '0';
 		return 1;
 	}
 	
@@ -86,13 +88,40 @@ void free_password(pwd *thepwd) {
 
 
 int main(){
-    struct pwd pass;
-    pass.buf = 'a';
-    pass.buflen = 1;
+	
+	pwd *pass = new_password(4);
+	printf("%d Buflen\n", pass->buflen);
+	printf("LOAD NEW HASH:");
+			
+	for (int i = 0; i < pass->buflen; i++){
+			printf("%c empty pass: ", pass->buf[i]);
+		}
 
-    printf("%p\n",new_password(pass.buflen));
+	for (int j = 0; j < 100000; j++){
+		int check = next_password(pass);
+		printf("NEXT \n");
+		for (int i = 0; i < pass->buflen-1; i++){
+				printf("%c pass: ", pass->buf[i]);
+			}
+	}
+		
 
-    //next_password( *pass);
+	//printf("%c Buffer \n", *pass->buf);
+	//printf("%p\n", )
+	//pass->buf[0] = 'a';
+	//pass->buf[1] = 'b';
+	//printf("%d Buffer \n", pass->buf[0]);
+	//
+	//while (check != 0){
+	//	sleep(3);
+	//	for (int i = 0; i < pass->buflen; i++){
+	//		printf("%c ", pass->buf[i]);
+	//	}
+	//	//sleep(1);
+	//	printf(" || ");
+//
+	//	check = next_password(pass);
+	//}
 
     return 0;
 }

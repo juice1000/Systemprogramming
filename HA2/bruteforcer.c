@@ -1,4 +1,5 @@
 #include "bruteforcer.h"
+#include <unistd.h>
 
 int main(int argc, char *argv[]) {
 	// Argumente checken
@@ -24,7 +25,7 @@ int main(int argc, char *argv[]) {
 	//for (int i = 0; i < max_workers; i++){
 	//	worker[i] = 0;
 	//}
-	
+
 	INFO("\nBRUTEFORCER GESTARTET\n");
 	INFO("---------------------\n");
 	INFO("Maximale Passwortlänge: %d\n", pwd_maxlen);
@@ -35,18 +36,21 @@ int main(int argc, char *argv[]) {
 	// Hashes in ein hashes struct laden
 	// TODO
 	loaded_hashes = load_hashes(filename);
+	int hash_count = 0;
 
 	// Main loop -> Iteriert über alle Hashes
 	for (int i = 0; i < loaded_hashes->len; i++) {
 		char *hash = loaded_hashes->array[i];
+		printf("\n%d LOAD NEW HASH: ", hash_count);
 		
 		// Hash mit crack_hash versuchen zu knacken
 		// TODO
-		if (crack_hash(hash) != NULL){
-			for (int i = 0; i < sizeof(loaded_hashes); i++){
-        		printf("%s\n",loaded_hashes->array[i]);
-    		}
-		}
+		crack_hash(hash);
+		//if (crack_hash(hash) != NULL){
+		//	for (int i = 0; i < sizeof(loaded_hashes); i++){
+        //		printf("%s\n",loaded_hashes->array[i]);
+    	//	}
+		//}
 
 		// Erfolg? -> print password
 		// Fehlgeschlagen? -> Einfach weiter in der Schleife
@@ -66,18 +70,35 @@ int main(int argc, char *argv[]) {
 // Returns pwd or NULL if no password was found
 pwd *crack_hash(char *hash) {
 	// Mit new_password() ein leeres Passwort anlegen
-	pwd *password = new_password(pwd_maxlen);
-	test_string(password->buf, hash);
+	int pwd_max = 4;
+	printf("%d maxLen", pwd_max);
+	pwd *password = new_password(pwd_max);
+
+	char *tempstring = password->buf;
+	tempstring = sha256(tempstring);
+	test_string(tempstring, hash);
+
+	for (int i = 0; i < password->buflen; i++){
+		    printf("%c empty pass: ", password->buf[i]);
+        }
+	sleep(3);
 	
-	while (next_password(password) != 0){
-		next_password(password);
-		password->buf = sha256(password->buf);
-		if (test_string(password->buf, hash) == 0){
+	int dead_end = next_password(password);
+	printf("%d Dead_End_var:", dead_end);
+	while (dead_end != 0){
+		
+		for (int i = 0; i < password->buflen; i++){
+		    printf("%c filled pass: ", password->buf[i]);
+        }
+		tempstring = password->buf;
+		tempstring = sha256(tempstring);
+		if (test_string(tempstring, hash) == 0){
 			return password;
 		}
-			
-
-	}
+        dead_end = next_password(password);
+		//printf("\n");
+    }
+	free_password(password);
 		
 	return NULL;
 	// Mit test_string() überprüfen, ob das (zuerst leere) Passwort zum Hash passt
@@ -99,6 +120,7 @@ pwd *crack_hash(char *hash) {
 
 // Berechnet den Hash von string und gibt 1 zurück, wenn er mit hash übereinstimmt, sonst 0
 int test_string(char *string, char *hash) {
+	string = sha256(string);
 	for (int i = 0; i < sizeof(string); i++){
 		if (string[i] != hash[i]){
 			//printf("FAILED");
