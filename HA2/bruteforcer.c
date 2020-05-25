@@ -39,17 +39,12 @@ int main(int argc, char *argv[]) {
 		char *hash = loaded_hashes->array[i];
 		INFO("\n LOAD HASH NUMBER: %d\n", i);
 		
-		for(int i=0;i<max_workers;i++) // loop will run n times (n=5) 
-    	{ 
+		for(int i=0;i<max_workers;i++){ // loop will run n times (n=5) 
+    	 
 			worker[i] = fork();
-			//printf("\n");
-			//for (int i=0;i<sizeof(worker[0]);i++){
-			//	printf("Workers online: %d ", worker[i]);
-			//}
-			//printf("\n");
-        	if(worker[i] == 0) 
-        	{ 
-        	    INFO("[son] pid %d from [parent] pid %d\n",getpid(),getppid()); 
+
+        	if(worker[i] == 0){ 
+        	    //INFO("[son] pid %d from [parent] pid %d\n",getpid(),getppid()); 
 				if (crack_hash(hash) != NULL){
 					pwd * result = crack_hash(hash);
 					printf("\nPASSWORD: ");
@@ -63,7 +58,6 @@ int main(int argc, char *argv[]) {
         	} 
     	} 
     	for(int i=0;i<max_workers;i++){ // loop will run n times (n=5) 
-			//printf("parent process %d waiting\n",getpid()); 
 			INFO("\n WORKERS ACTIVE: %d\n", update_worker());
 			wait(NULL); 
 		} 
