@@ -6,9 +6,7 @@ pwd *new_password(int maxlen) {
 	pwd *passw = malloc(sizeof(pwd));
 	passw->buflen=maxlen+1;
 	passw->buf = malloc(sizeof(char)*maxlen);
-	for (int i = 0; i < passw->buflen; i++){
-		passw->buf[i] = '\0';
-	}
+	passw->buf[0] = '\0';
 
 	return passw;
 }
