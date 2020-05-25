@@ -23,9 +23,7 @@ int main(int argc, char *argv[]) {
 		worker[i] = 0;
 	}
 
-	pid_t p = fork();
-	pid_t r = fork();
-
+	
 	INFO("\nBRUTEFORCER GESTARTET\n");
 	INFO("---------------------\n");
 	INFO("Maximale Passwortlänge: %d\n", pwd_maxlen);
@@ -39,45 +37,36 @@ int main(int argc, char *argv[]) {
 	// Main loop -> Iteriert über alle Hashes
 	for (int i = 0; i < loaded_hashes->len; i++) {
 		char *hash = loaded_hashes->array[i];
-		printf("\n%d LOAD HASH NUMBER: ", i);
+		INFO("\n LOAD HASH NUMBER: %d\n", i);
 		
-		if (p == 0){
-			printf("\n%d CHILD: ", p);
-			// Hash mit crack_hash versuchen zu knacken
-			if (crack_hash(hash) != NULL){
-				pwd * result = crack_hash(hash);
-				printf("\nPASSWORD: ");
-				for (int i = 0; i < pwd_maxlen; i++){
-					// TODO print password if found, test with crack_hash == NULL!
-        			printf("%c", result->buf[i]);
-    			}
-				free_password(result);
-				break;
-			}
-		}
-		else{
-			//printf("\n%d PARENT: ", p);
-
-		}
-		if (r == 0){
-			printf("\n%d CHILD: ", r);
-			// Hash mit crack_hash versuchen zu knacken
-			if (crack_hash(hash) != NULL){
-				pwd * result = crack_hash(hash);
-				printf("\nPASSWORD: ");
-				for (int i = 0; i < pwd_maxlen; i++){
-					// TODO print password if found, test with crack_hash == NULL!
-        			printf("%c", result->buf[i]);
-    			}
-				free_password(result);
-				break;
-			}
-		}
-		else{
-			//printf("\n%d PARENT: ", p);
-
-		}
-		
+		for(int i=0;i<max_workers;i++) // loop will run n times (n=5) 
+    	{ 
+			worker[i] = fork();
+			//printf("\n");
+			//for (int i=0;i<sizeof(worker[0]);i++){
+			//	printf("Workers online: %d ", worker[i]);
+			//}
+			//printf("\n");
+        	if(worker[i] == 0) 
+        	{ 
+        	    INFO("[son] pid %d from [parent] pid %d\n",getpid(),getppid()); 
+				if (crack_hash(hash) != NULL){
+					pwd * result = crack_hash(hash);
+					printf("\nPASSWORD: ");
+					for (int i = 0; i < pwd_maxlen; i++){
+        				printf("%c", result->buf[i]);
+    				}
+					printf("\n");
+					free_password(result);
+				}
+        	    exit(0); 
+        	} 
+    	} 
+    	for(int i=0;i<max_workers;i++){ // loop will run n times (n=5) 
+			//printf("parent process %d waiting\n",getpid()); 
+			INFO("\n WORKERS ACTIVE: %d\n", update_worker());
+			wait(NULL); 
+		} 
 		
 	}
 
@@ -153,17 +142,19 @@ int test_string(char *string, char *hash) {
  *   Prozesse zurückgeben. Prozesse die beendet wurden zählen nicht dazu.
  */
 int update_worker() {
-	int n = 0;
-	for (int i = 0; i < max_workers; i++) {
-		// TODO
-		n = max_workers;
-		// check if process still running
-		// if finished
-		worker[i] = 0;
-		n = n -1;
-
-	}
 	
-	return n;
+	for (int i = 0; i < max_workers; i++) {
+		if (waitpid( worker[i] , NULL , WNOHANG) != 0){
+			worker[i] = 0;
+		}
+	}
+
+	int worker_count = 0;
+	for (int i = 0; i < max_workers; i++) {
+		if (worker[i] == 0){
+			worker_count = worker_count + 1;
+		}
+	}
+	return worker_count;
 }
 
