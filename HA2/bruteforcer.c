@@ -14,8 +14,9 @@ int main(int argc, char *argv[]) {
 	// Kommandozeilenargumente auslesen und globale und lokale Variablen füllen
 	// TODO: Vervollständigen
 	int pwd_maxlen = (int) strtol(argv[1], (char **)NULL, 10);
-	int max_workers = (int) strtol(argv[1], (char **)NULL, 10);
+	int max_workers = (int) strtol(argv[2], (char **)NULL, 10);
 	filename = argv[3];
+
 
 	// worker = ...
 	// worker array mit 0 initialisieren
@@ -40,15 +41,17 @@ int main(int argc, char *argv[]) {
 	// Main loop -> Iteriert über alle Hashes
 	for (int i = 0; i < loaded_hashes->len; i++) {
 		char *hash = loaded_hashes->array[i];
-		printf("\n%d LOAD NEW HASH: ", i);
+		printf("\n%d LOAD HASH NUMBER: ", i);
 		
 		// Hash mit crack_hash versuchen zu knacken
 
 		//crack_hash(hash);
 		if (crack_hash(hash) != NULL){
+			pwd * result = crack_hash(hash);
+			printf("\nPASSWORD: ");
 			for (int i = 0; i < pwd_maxlen; i++){
 				// TODO print password if found, test with crack_hash == NULL!
-        		printf("'%c'", *((char*)crack_hash(hash)));
+        		printf("%c", result->buf[i]);
     		}
 			break;
 		}
@@ -72,21 +75,22 @@ int main(int argc, char *argv[]) {
 pwd *crack_hash(char *hash) {
 	// Mit new_password() ein leeres Passwort anlegen
 	int pwd_max = 4;
-	printf("%d maxLen", pwd_max);
+	printf("%d maxLen", pwd_maxlen);
 	pwd *password = new_password(pwd_max);
 
 	char *tempstring = password->buf;
 	tempstring = sha256(tempstring);
 	test_string(tempstring, hash);
 
+	printf("\nempty password: \n");
 	for (int i = 0; i < password->buflen; i++){
-		    printf("%c empty pass: ", password->buf[i]);
+		    printf("%c", password->buf[i]);
         }
 	
 	//printf("\n");
 	
 	int dead_end = next_password(password);
-	printf("%d Dead_End_var:", dead_end);
+	printf("\n %d Dead_End_var:", dead_end);
 	sleep(3);
 	while (dead_end != 0){
 		
@@ -126,7 +130,7 @@ pwd *crack_hash(char *hash) {
 int test_string(char *string, char *hash) {
 	string = sha256(string);
 
-	for (int i = 0; i < 64; i++){
+	for (int i = 0; i < 64; i++){ // Size of Hash is 64
 		//printf("%c", string[i]);
 		//printf(" || ");
 		//printf("%c", hash[i]);
