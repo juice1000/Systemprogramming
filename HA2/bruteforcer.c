@@ -36,21 +36,22 @@ int main(int argc, char *argv[]) {
 	// Hashes in ein hashes struct laden
 	// TODO
 	loaded_hashes = load_hashes(filename);
-	int hash_count = 0;
 
 	// Main loop -> Iteriert über alle Hashes
 	for (int i = 0; i < loaded_hashes->len; i++) {
 		char *hash = loaded_hashes->array[i];
-		printf("\n%d LOAD NEW HASH: ", hash_count);
+		printf("\n%d LOAD NEW HASH: ", i);
 		
 		// Hash mit crack_hash versuchen zu knacken
-		// TODO
-		crack_hash(hash);
-		//if (crack_hash(hash) != NULL){
-		//	for (int i = 0; i < sizeof(loaded_hashes); i++){
-        //		printf("%s\n",loaded_hashes->array[i]);
-    	//	}
-		//}
+
+		//crack_hash(hash);
+		if (crack_hash(hash) != NULL){
+			for (int i = 0; i < pwd_maxlen; i++){
+				// TODO print password if found, test with crack_hash == NULL!
+        		printf("'%c'", *((char*)crack_hash(hash)));
+    		}
+			break;
+		}
 
 		// Erfolg? -> print password
 		// Fehlgeschlagen? -> Einfach weiter in der Schleife
@@ -81,15 +82,18 @@ pwd *crack_hash(char *hash) {
 	for (int i = 0; i < password->buflen; i++){
 		    printf("%c empty pass: ", password->buf[i]);
         }
-	sleep(3);
+	
+	//printf("\n");
 	
 	int dead_end = next_password(password);
 	printf("%d Dead_End_var:", dead_end);
+	sleep(3);
 	while (dead_end != 0){
 		
-		for (int i = 0; i < password->buflen; i++){
-		    printf("%c filled pass: ", password->buf[i]);
-        }
+		//for (int i = 0; i < password->buflen; i++){
+		//    printf("%c", password->buf[i]);
+        //}
+
 		tempstring = password->buf;
 		tempstring = sha256(tempstring);
 		if (test_string(tempstring, hash) == 0){
@@ -121,7 +125,11 @@ pwd *crack_hash(char *hash) {
 // Berechnet den Hash von string und gibt 1 zurück, wenn er mit hash übereinstimmt, sonst 0
 int test_string(char *string, char *hash) {
 	string = sha256(string);
-	for (int i = 0; i < sizeof(string); i++){
+
+	for (int i = 0; i < 64; i++){
+		//printf("%c", string[i]);
+		//printf(" || ");
+		//printf("%c", hash[i]);
 		if (string[i] != hash[i]){
 			//printf("FAILED");
 			return 1;

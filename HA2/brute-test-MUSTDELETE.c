@@ -40,18 +40,22 @@ int main(int argc, char *argv[]) {
 	INFO("---------------------\n\n");
 	
 	// Hashes in ein hashes struct laden
-    pwd * password = new_password(pwd_maxlen);
-    printf("empty passw: ");
-	    for (int i = 0; i < password->buflen; i++){
-		    printf("%c", password->buf[i]);
-        }
+    //pwd * password = new_password(pwd_maxlen);
+    //printf("empty passw: ");
+	//    for (int i = 0; i < password->buflen; i++){
+	//	    printf("%c", password->buf[i]);
+    //    }
 	// TODO
 	loaded_hashes = load_hashes(filename);
 
 	// Main loop -> Iteriert über alle Hashes
 	for (int i = 0; i < loaded_hashes->len; i++) {
 
-        
+        pwd * password = new_password(pwd_maxlen);
+	    printf("empty passw: ");
+	    for (int i = 0; i < password->buflen; i++){
+		    printf("%c", password->buf[i]);
+        }
 		char *hash = loaded_hashes->array[i];
 		printf("\n%d LOAD NEW HASH: ", i);
 		sleep(3);
@@ -115,11 +119,7 @@ int main(int argc, char *argv[]) {
 	    	printf("\n");
         }
         free_password(password);
-        pwd * password = new_password(pwd_maxlen);
-	    printf("empty passw: ");
-	    for (int i = 0; i < password->buflen; i++){
-		    printf("%c", password->buf[i]);
-        }
+        
 		//if (crack_hash(hash) != NULL){
 		//	for (int i = 0; i < sizeof(loaded_hashes); i++){
         //		printf("%s\n",loaded_hashes->array[i]);
