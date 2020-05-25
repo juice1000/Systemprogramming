@@ -12,20 +12,19 @@ int main(int argc, char *argv[]) {
 	hashes *loaded_hashes = NULL;
 	
 	// Kommandozeilenargumente auslesen und globale und lokale Variablen füllen
-	// TODO: Vervollständigen
-	int pwd_maxlen = (int) strtol(argv[1], (char **)NULL, 10);
-	int max_workers = (int) strtol(argv[2], (char **)NULL, 10);
+	pwd_maxlen = (int) strtol(argv[1], (char **)NULL, 10);
+	max_workers = (int) strtol(argv[2], (char **)NULL, 10);
 	filename = argv[3];
 
 
-	// worker = ...
+	worker = malloc(sizeof(pid_t) * max_workers);
 	// worker array mit 0 initialisieren
-	// TODO
-	//pid_t *worker = malloc(sizeof(pid_t) * max_workers);
-	//// worker array mit 0 initialisieren
-	//for (int i = 0; i < max_workers; i++){
-	//	worker[i] = 0;
-	//}
+	for (int i = 0; i < max_workers; i++){
+		worker[i] = 0;
+	}
+
+	pid_t p = fork();
+	pid_t r = fork();
 
 	INFO("\nBRUTEFORCER GESTARTET\n");
 	INFO("---------------------\n");
@@ -35,7 +34,6 @@ int main(int argc, char *argv[]) {
 	INFO("---------------------\n\n");
 	
 	// Hashes in ein hashes struct laden
-	// TODO
 	loaded_hashes = load_hashes(filename);
 
 	// Main loop -> Iteriert über alle Hashes
@@ -43,19 +41,43 @@ int main(int argc, char *argv[]) {
 		char *hash = loaded_hashes->array[i];
 		printf("\n%d LOAD HASH NUMBER: ", i);
 		
-		// Hash mit crack_hash versuchen zu knacken
-
-		//crack_hash(hash);
-		if (crack_hash(hash) != NULL){
-			pwd * result = crack_hash(hash);
-			printf("\nPASSWORD: ");
-			for (int i = 0; i < pwd_maxlen; i++){
-				// TODO print password if found, test with crack_hash == NULL!
-        		printf("%c", result->buf[i]);
-    		}
-			free_password(result);
-			break;
+		if (p == 0){
+			printf("\n%d CHILD: ", p);
+			// Hash mit crack_hash versuchen zu knacken
+			if (crack_hash(hash) != NULL){
+				pwd * result = crack_hash(hash);
+				printf("\nPASSWORD: ");
+				for (int i = 0; i < pwd_maxlen; i++){
+					// TODO print password if found, test with crack_hash == NULL!
+        			printf("%c", result->buf[i]);
+    			}
+				free_password(result);
+				break;
+			}
 		}
+		else{
+			//printf("\n%d PARENT: ", p);
+
+		}
+		if (r == 0){
+			printf("\n%d CHILD: ", r);
+			// Hash mit crack_hash versuchen zu knacken
+			if (crack_hash(hash) != NULL){
+				pwd * result = crack_hash(hash);
+				printf("\nPASSWORD: ");
+				for (int i = 0; i < pwd_maxlen; i++){
+					// TODO print password if found, test with crack_hash == NULL!
+        			printf("%c", result->buf[i]);
+    			}
+				free_password(result);
+				break;
+			}
+		}
+		else{
+			//printf("\n%d PARENT: ", p);
+
+		}
+		
 		
 	}
 
@@ -69,25 +91,22 @@ int main(int argc, char *argv[]) {
 // und darauf getestet wird, ob deren Hash mit hash übereinstimmt
 // Returns pwd or NULL if no password was found
 pwd *crack_hash(char *hash) {
-	// Mit new_password() ein leeres Passwort anlegen
-	int pwd_max = 4;
-	printf("%d maxLen", pwd_maxlen);
-	pwd *password = new_password(pwd_max);
+	// Create new password
+	pwd *password = new_password(pwd_maxlen);
 
+	// Generate tempsting so password won't get affected by hashing, compare tempstring with the extracted hash
 	char *tempstring = password->buf;
 	tempstring = sha256(tempstring);
 	test_string(tempstring, hash);
 
-	printf("\nempty password: \n");
-	for (int i = 0; i < password->buflen; i++){
-		    printf("%c", password->buf[i]);
-        }
+	//printf("\nempty password: \n");
+	//for (int i = 0; i < password->buflen; i++){
+	//	    printf("%c", password->buf[i]);
+    //    }
 	
 	//printf("\n");
 	
-	int dead_end = next_password(password);
-	//printf("\n %d Dead_End_var:", dead_end);
-	sleep(3);
+	int dead_end = next_password(password); // Create dead_end from return of next_password as while loop breaker
 	while (dead_end != 0){
 		
 		//for (int i = 0; i < password->buflen; i++){
@@ -105,37 +124,21 @@ pwd *crack_hash(char *hash) {
 	free_password(password);
 		
 	return NULL;
-	// Mit test_string() überprüfen, ob das (zuerst leere) Passwort zum Hash passt
-	// In einer Schleife next_password() aufrufen, und das nächste Passwort überprüfen
-	// Schleifenabbruch, sobald next_password() 0 zurückgibt => es gibt kein weiteres Passwort,
-	// d.h. alle Passwörter bis zur maximalen Länge wurden bereits generiert und überprüft
-	// ODER
-	// Schleifenabbruch, wenn das Passwort gefunden wurde
-	// TODO
-	
-	// Aufräumen
-	// TODO
-	
-	// Passwort nicht gefunden -> NULL zurückgeben
-	// Passwort gefunden -> das Password zurückgeben
-	// TODO
 	
 }
 
 // Berechnet den Hash von string und gibt 1 zurück, wenn er mit hash übereinstimmt, sonst 0
 int test_string(char *string, char *hash) {
-	//string = sha256(string);
 
 	for (int i = 0; i < 64; i++){ // Size of Hash is 64
 		//printf("%c", string[i]);
 		//printf(" || ");
 		//printf("%c", hash[i]);
 		if (string[i] != hash[i]){
-			//printf("FAILED");
 			return 1;
 		}
 	}
-	printf("SUCCESS");
+	//printf("SUCCESS");
 	return 0;
 }
 
