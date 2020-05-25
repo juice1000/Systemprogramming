@@ -53,21 +53,17 @@ int main(int argc, char *argv[]) {
 				// TODO print password if found, test with crack_hash == NULL!
         		printf("%c", result->buf[i]);
     		}
+			free_password(result);
 			break;
 		}
-
-		// Erfolg? -> print password
-		// Fehlgeschlagen? -> Einfach weiter in der Schleife
 		
 	}
-	
-	
-	// Aufräumen und beenden
-	// TODO
+
 	free_hashes(loaded_hashes);
 	
 	return 0;
 }
+
 
 // Versucht den Hash zu cracken, indem systematisch Passwörter generiert werden
 // und darauf getestet wird, ob deren Hash mit hash übereinstimmt
@@ -90,7 +86,7 @@ pwd *crack_hash(char *hash) {
 	//printf("\n");
 	
 	int dead_end = next_password(password);
-	printf("\n %d Dead_End_var:", dead_end);
+	//printf("\n %d Dead_End_var:", dead_end);
 	sleep(3);
 	while (dead_end != 0){
 		
@@ -128,7 +124,7 @@ pwd *crack_hash(char *hash) {
 
 // Berechnet den Hash von string und gibt 1 zurück, wenn er mit hash übereinstimmt, sonst 0
 int test_string(char *string, char *hash) {
-	string = sha256(string);
+	//string = sha256(string);
 
 	for (int i = 0; i < 64; i++){ // Size of Hash is 64
 		//printf("%c", string[i]);
