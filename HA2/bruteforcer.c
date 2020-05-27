@@ -71,21 +71,16 @@ int main(int argc, char *argv[]) {
 					break;
 				}
 				j++;
-				wait(NULL);
+				//
 				
 			}
-			printf("J is: %d\n", j);
-			j = 0;
 		} 
-		INFO("\n%d AFTER UPDATE\n",update_worker());
-		for(int k = 0; k < max_workers; k++){
-			printf(" %d ", worker[k]);
-		}
-		printf("\n");
+		INFO("\nWORKERS ACTIVE: %d\n",update_worker());
 		
 	}
 
 	free_hashes(loaded_hashes);
+	wait(NULL);	// Parent process still needs to wait until all child processes are finished before it can terminate
 	
 	return 0;
 }
