@@ -64,14 +64,13 @@ int main(int argc, char *argv[]) {
 		else if (pid > 0){
 			int j = 0;
 			while(j <= max_workers){ // loop will run n times (n=5) 
-				//INFO("\n WORKERS ACTIVE: %d\n", update_worker());
 				if(worker[j] == 0){ //check for empty entry in array
 					worker[j]=pid;
 					
 					break;
 				}
 				j++;
-				//
+
 				
 			}
 		} 
