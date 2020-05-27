@@ -33,34 +33,50 @@ int main(int argc, char *argv[]) {
 	
 	// Hashes in ein hashes struct laden
 	loaded_hashes = load_hashes(filename);
+	pid_t pid = 0;
 
 	// Main loop -> Iteriert über alle Hashes
 	for (int i = 0; i < loaded_hashes->len; i++) {
 		char *hash = loaded_hashes->array[i];
 		INFO("\n LOAD HASH NUMBER: %d\n", i);
 		
-		for(int i=0;i<max_workers;i++){ // loop will run n times (n=5) 
-    	 
-			worker[i] = fork();
+    	
+		while(update_worker() >= max_workers){
+			waitpid( -1 , NULL , 0);
+		}
+		if(update_worker() < max_workers){
+			pid = fork();
+		}
+		
 
-        	if(worker[i] == 0){ 
-        	    //INFO("[son] pid %d from [parent] pid %d\n",getpid(),getppid()); 
-				if (crack_hash(hash) != NULL){
-					pwd * result = crack_hash(hash);
-					printf("\nPASSWORD: ");
-					for (int i = 0; i < pwd_maxlen; i++){
-        				printf("%c", result->buf[i]);
-    				}
-					printf("\n");
-					free_password(result);
+		// das passt!!
+        if(pid == 0){ 
+            //INFO("[son] pid %d from [parent] pid %d\n",getpid(),getppid()); 
+			if (crack_hash(hash) != NULL){
+				pwd * result = crack_hash(hash);
+				printf("\nPASSWORD: ");
+				for (int i = 0; i < pwd_maxlen; i++){
+        			printf("%c", result->buf[i]);
+    			}
+				printf("\n");
+				free_password(result);
+			}
+            exit(0); 
+        } 
+		else if (pid > 0){
+			int j = 0;
+			while(j <= max_workers){ // loop will run n times (n=5) 
+				//INFO("\n WORKERS ACTIVE: %d\n", update_worker());
+				if(worker[j] == 0){ //check for empty entry in array
+					worker[j]=pid;
+					INFO("\n%d AFTER UPDATE\n",update_worker());
+					break;
 				}
-        	    exit(0); 
-        	} 
-    	} 
-    	for(int i=0;i<max_workers;i++){ // loop will run n times (n=5) 
-			INFO("\n WORKERS ACTIVE: %d\n", update_worker());
-			wait(NULL); 
-		} 
+				j++;
+				wait(NULL);
+			}
+			j = 0;
+		}    	
 		
 	}
 
@@ -136,18 +152,17 @@ int test_string(char *string, char *hash) {
  *   Prozesse zurückgeben. Prozesse die beendet wurden zählen nicht dazu.
  */
 int update_worker() {
-	
-	for (int i = 0; i < max_workers; i++) {
-		if (waitpid( worker[i] , NULL , WNOHANG) != 0){
-			worker[i] = 0;
-		}
-	}
 
 	int worker_count = 0;
+	
 	for (int i = 0; i < max_workers; i++) {
-		if (worker[i] == 0){
+		if (waitpid(worker[i], NULL , WNOHANG) != 0){ //check if process is terminated  // check if process is stored in array
+			worker[i] = 0;	//set this field as 0
+		}
+		if (worker[i] != 0){
 			worker_count = worker_count + 1;
 		}
+
 	}
 	return worker_count;
 }
