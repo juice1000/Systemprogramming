@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
 		
 		// das passt!!
         if(pid == 0){ 
-            //INFO("[son] pid %d from [parent] pid %d\n",getpid(),getppid()); 
+            INFO("[son] pid %d from [parent] pid %d\n",getpid(),getppid()); 
 			if (crack_hash(hash) != NULL){
 				pwd * result = crack_hash(hash);
 				printf("\nPASSWORD: ");
