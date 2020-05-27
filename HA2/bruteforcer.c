@@ -44,11 +44,8 @@ int main(int argc, char *argv[]) {
 		while(update_worker() >= max_workers){
 			waitpid( -1 , NULL , 0);
 		}
-		if(update_worker() < max_workers){
-			pid = fork();
-		}
+		pid = fork(); 
 		
-
 		// das passt!!
         if(pid == 0){ 
             //INFO("[son] pid %d from [parent] pid %d\n",getpid(),getppid()); 
@@ -60,23 +57,31 @@ int main(int argc, char *argv[]) {
     			}
 				printf("\n");
 				free_password(result);
+				
 			}
             exit(0); 
-        } 
+        }
 		else if (pid > 0){
 			int j = 0;
 			while(j <= max_workers){ // loop will run n times (n=5) 
 				//INFO("\n WORKERS ACTIVE: %d\n", update_worker());
 				if(worker[j] == 0){ //check for empty entry in array
 					worker[j]=pid;
-					INFO("\n%d AFTER UPDATE\n",update_worker());
+					
 					break;
 				}
 				j++;
 				wait(NULL);
+				
 			}
+			printf("J is: %d\n", j);
 			j = 0;
-		}    	
+		} 
+		INFO("\n%d AFTER UPDATE\n",update_worker());
+		for(int k = 0; k < max_workers; k++){
+			printf(" %d ", worker[k]);
+		}
+		printf("\n");
 		
 	}
 
@@ -129,16 +134,12 @@ pwd *crack_hash(char *hash) {
 // Berechnet den Hash von string und gibt 1 zurück, wenn er mit hash übereinstimmt, sonst 0
 int test_string(char *string, char *hash) {
 
-	for (int i = 0; i < 64; i++){ // Size of Hash is 64
-		//printf("%c", string[i]);
-		//printf(" || ");
-		//printf("%c", hash[i]);
-		if (string[i] != hash[i]){
-			return 1;
-		}
+	if(strncmp(string, hash, 64)==0){
+		return 0;
 	}
-	//printf("SUCCESS");
-	return 0;
+	else{
+		return 1;
+	}
 }
 
 /**
@@ -156,13 +157,13 @@ int update_worker() {
 	int worker_count = 0;
 	
 	for (int i = 0; i < max_workers; i++) {
-		if (waitpid(worker[i], NULL , WNOHANG) != 0){ //check if process is terminated  // check if process is stored in array
-			worker[i] = 0;	//set this field as 0
-		}
-		if (worker[i] != 0){
+		if(worker[i] != 0){	//check if entry is empty
 			worker_count = worker_count + 1;
-		}
-
+			if (waitpid(worker[i], NULL , WNOHANG) != 0){ //check if process is terminated
+				worker[i] = 0;	//set this field as 0
+				worker_count = worker_count -1;
+			}
+		}	
 	}
 	return worker_count;
 }
