@@ -77,10 +77,12 @@ int main(int argc, char *argv[]) {
 		
 	}
 
+	
+	while(update_worker() > 0){
+		wait(NULL);	// Parent process still needs to wait until all child processes are finished before it can terminate
+	}
 	free_hashes(loaded_hashes);
 	free(worker);
-	wait(NULL);	// Parent process still needs to wait until all child processes are finished before it can terminate
-	
 	return 0;
 }
 
