@@ -4,9 +4,9 @@ int next_pwd_internal(char *shifted_buffer, int remaining_buff_size);
 
 pwd *new_password(int maxlen) {
 	pwd *passw = malloc(sizeof(pwd));
-	passw->buflen=maxlen+1;
+	passw->buflen=maxlen+1;	// maxlen + 1 für '\0' entry
 	passw->buf = malloc(sizeof(char)*maxlen);
-	passw->buf[0] = '\0';
+	passw->buf[0] = '\0'; //will get recognized in next_pwd_internal
 
 	return passw;
 }
@@ -75,6 +75,7 @@ int next_pwd_internal(char *shifted_buffer, int remaining_buff_size) {
 	return 0;
 }
 
+// Frees password and buffer of chars
 void free_password(pwd *thepwd) {
 
 	free(thepwd->buf);

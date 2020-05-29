@@ -16,9 +16,8 @@ int main(int argc, char *argv[]) {
 	max_workers = (int) strtol(argv[2], (char **)NULL, 10);
 	filename = argv[3];
 
-
+	// speicher freigeben für worker array und einträge mit 0 initialisieren
 	worker = malloc(sizeof(pid_t) * max_workers);
-	// worker array mit 0 initialisieren
 	for (int i = 0; i < max_workers; i++){
 		worker[i] = 0;
 	}
@@ -33,20 +32,20 @@ int main(int argc, char *argv[]) {
 	
 	// Hashes in ein hashes struct laden
 	loaded_hashes = load_hashes(filename);
-	pid_t pid = 0;
 
 	// Main loop -> Iteriert über alle Hashes
 	for (int i = 0; i < loaded_hashes->len; i++) {
 		char *hash = loaded_hashes->array[i];
-		INFO("\n LOAD HASH NUMBER: %d\n", i);
+		INFO("\n LOAD HASH NUMBER: %d\n", i); // keep track of iteration through hashes
 		
-    	
+    	// if maximum number of workers running, wait for one process to change status
 		while(update_worker() >= max_workers){
 			waitpid( -1 , NULL , 0);
 		}
-		pid = fork(); 
+
+		pid_t pid = fork(); 
 		
-		// das passt!!
+		// Child process
         if(pid == 0){ 
             INFO("[son] pid %d from [parent] pid %d\n",getpid(),getppid()); 
 			if (crack_hash(hash) != NULL){
@@ -61,16 +60,16 @@ int main(int argc, char *argv[]) {
 			}
             exit(0); 
         }
+		// parent process (<0 not considered as error handling not necessary in this task)
 		else if (pid > 0){
 			int j = 0;
-			while(j <= max_workers){ // loop will run n times (n=5) 
-				if(worker[j] == 0){ //check for empty entry in array
+			while(j <= max_workers){
+				if(worker[j] == 0){ //check for empty entry in array and assign newly generated pid
 					worker[j]=pid;
 					
 					break;
 				}
 				j++;
-
 				
 			}
 		} 
@@ -79,6 +78,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	free_hashes(loaded_hashes);
+	free(worker);
 	wait(NULL);	// Parent process still needs to wait until all child processes are finished before it can terminate
 	
 	return 0;
@@ -92,24 +92,13 @@ pwd *crack_hash(char *hash) {
 	// Create new password
 	pwd *password = new_password(pwd_maxlen);
 
-	// Generate tempsting so password won't get affected by hashing, compare tempstring with the extracted hash
+	// Generate tempstring so password won't get affected by hashing, compare tempstring with the extracted hash
 	char *tempstring = password->buf;
 	tempstring = sha256(tempstring);
 	test_string(tempstring, hash);
-
-	//printf("\nempty password: \n");
-	//for (int i = 0; i < password->buflen; i++){
-	//	    printf("%c", password->buf[i]);
-    //    }
-	
-	//printf("\n");
 	
 	int dead_end = next_password(password); // Create dead_end from return of next_password as while loop breaker
 	while (dead_end != 0){
-		
-		//for (int i = 0; i < password->buflen; i++){
-		//    printf("%c", password->buf[i]);
-        //}
 
 		tempstring = password->buf;
 		tempstring = sha256(tempstring);
@@ -117,7 +106,7 @@ pwd *crack_hash(char *hash) {
 			return password;
 		}
         dead_end = next_password(password);
-		//printf("\n");
+
     }
 	free_password(password);
 		
