@@ -14,6 +14,8 @@ int queue_add(void* new_obejct, queue_object* queue){
     return 0;
 }
 
+
+
 void* queue_poll(queue_object* queue){
     if(queue==NULL || queue->next==NULL){
         return NULL;
@@ -61,4 +63,17 @@ void* queue_peek(queue_object* queue){
         object_to_find=object_to_find->next;
     }
     return object_to_find->object;
+}
+
+void* queue_poll2(queue_object* queue){
+    
+    if(queue==NULL || queue->next==NULL){
+        
+        return NULL;
+    }
+    queue_object* object_to_find=queue->next;
+    void* object = object_to_find->object;
+    queue->next = queue->next->next;
+    free(object_to_find);
+    return object;
 }
