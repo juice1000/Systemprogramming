@@ -3,7 +3,7 @@
 
 
 process* PRIOP_tick (process* running_process){
-    //TODO
+    int x;
     return NULL;
 }
 
