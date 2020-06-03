@@ -13,6 +13,9 @@ typedef struct _queue_object{
  */
 int queue_add(void* new_obejct, queue_object* queue);
 
+int queue_addR(void* new_obejct, queue_object* queue);
+
+void* queue_poll2(queue_object* queue);
 
 /**
  * gets and deletes the oldest item from the queue
