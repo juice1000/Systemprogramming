@@ -26,7 +26,9 @@ int queue_add_SRTNP(process* new_obejct, queue_object* queue);
 
 void* queue_poll2(queue_object* queue);
 
-float response_rate(int waiting_time, int service_time)
+float response_rate(int waiting_time, int service_time);
+
+void HRRN_rearrange(queue_object* queue);
 
 /**
  * gets and deletes the oldest item from the queue
