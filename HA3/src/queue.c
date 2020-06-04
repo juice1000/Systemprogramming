@@ -11,7 +11,11 @@ int queue_add(void* new_obejct, queue_object* queue){
     }
     new_queue_object->object=new_obejct;
     new_queue_object->next=queue->next;
-    queue->next=new_queue_object;
+    new_queue_object->waiting_time = 0;
+
+    new_queue_object->time_left = new_obejct->time_left;
+    new_queue_object->service_time = new_queue_object->time_left;
+    queue->next = new_queue_object;
     return 0;
 }
 
@@ -117,4 +121,45 @@ void* queue_poll2(queue_object* queue){
     queue->next = queue->next->next;
     free(object_to_find);
     return object;
+}
+
+float response_rate(int waiting_time, int service_time){
+    float rr = (waiting_time + service_time)/ service_time;
+    return rr;
+}
+
+void HRRN_rearrange(queue_object* queue){
+
+    queue_object * prev = queue; 
+    float max_rr = 0.0;
+    queue_object * front = queue;
+    while(prev->next != NULL){
+        prev->rr = response_rate(prev->waiting_time, prev->service_time);
+        if (prev->rr > max_rr){
+            max_rr = prev->rr;
+        }
+        prev = prev->next;
+    }
+
+    queue_object * prev2 = queue;
+    while(prev2->next != NULL){
+        if(prev2->rr == max_rr){
+            front = prev2;
+        }
+        prev2 = prev2->next;
+    }
+
+    front->next = prev2->next;
+    prev2->next = front;
+
+    queue_object * prev3 = queue;
+
+    while(prev3->next != NULL && prev3->next->rr != front->rr){
+        prev3 = prev3->next;
+    }
+
+    queue_object * temp = prev3;
+    free(prev3->next);
+    prev3->next = prev3->next->next;
+    
 }

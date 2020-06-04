@@ -7,6 +7,10 @@ typedef struct _queue_object{
     void* object;
     struct _queue_object* next;
     int priority;
+    int time_left;
+    int service_time;
+    int waiting_time;
+    float rr;
 }queue_object;
 
 /**
@@ -18,7 +22,11 @@ int queue_add(void* new_obejct, queue_object* queue);
 
 int queue_add_PRIOP(process* new_obejct, queue_object* queue);
 
+int queue_add_SRTNP(process* new_obejct, queue_object* queue);
+
 void* queue_poll2(queue_object* queue);
+
+float response_rate(int waiting_time, int service_time)
 
 /**
  * gets and deletes the oldest item from the queue
