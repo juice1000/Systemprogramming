@@ -8,6 +8,7 @@
 queue_object* SRTNP_queue;
 //You can add more global variables and structs here
 
+process * front_process;
 /**
  * determine which is the current process to be processed. 
  * @param running_process the prevously running process
