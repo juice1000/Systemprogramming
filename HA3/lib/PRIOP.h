@@ -6,6 +6,7 @@
 
 
 queue_object* PRIOP_queue;
+process* front_process;
 //You can add more global variables and structs here
 
 /**

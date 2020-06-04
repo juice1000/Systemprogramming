@@ -1,4 +1,5 @@
 #include "../lib/queue.h"
+#include "../lib/process.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -14,7 +15,26 @@ int queue_add(void* new_obejct, queue_object* queue){
     return 0;
 }
 
+int queue_add_PRIOP(process* new_obejct, queue_object* queue){
+    queue_object* new_queue_object= calloc(1,sizeof(queue_object));
+    if (new_queue_object==NULL){
+        return 1;
+    }
+    new_queue_object->object = new_obejct;
+    new_queue_object->next = NULL;
+    new_queue_object->priority = new_obejct->priority;
 
+
+	queue_object * prev = queue;  
+    while(prev->next != NULL && prev->next->priority < new_queue_object->priority){ //slides the newly added element through the queue until it reaches its correct position
+    	prev=prev->next;		
+    }
+	queue_object * tmp = prev->next;
+    prev->next = new_queue_object;
+    new_queue_object->next = tmp;
+
+	return 0;
+}
 
 void* queue_poll(queue_object* queue){
     if(queue==NULL || queue->next==NULL){

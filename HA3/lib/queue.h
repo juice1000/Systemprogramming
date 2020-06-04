@@ -1,9 +1,12 @@
 #ifndef QUEUE_H
 #define QUEUE_H
+#include "process.h"
+
 
 typedef struct _queue_object{
     void* object;
     struct _queue_object* next;
+    int priority;
 }queue_object;
 
 /**
@@ -13,7 +16,7 @@ typedef struct _queue_object{
  */
 int queue_add(void* new_obejct, queue_object* queue);
 
-int queue_addR(void* new_obejct, queue_object* queue);
+int queue_add_PRIOP(process* new_obejct, queue_object* queue);
 
 void* queue_poll2(queue_object* queue);
 
