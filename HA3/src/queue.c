@@ -12,6 +12,7 @@ int queue_add(void* new_obejct, queue_object* queue){
     new_queue_object->object=new_obejct;
     new_queue_object->next=queue->next;
     new_queue_object->waiting_time = 0;
+    new_queue_object->rr = 1;
 
     new_queue_object->time_left = new_obejct->time_left;
     new_queue_object->service_time = new_queue_object->time_left;
@@ -113,7 +114,6 @@ void* queue_peek(queue_object* queue){
 void* queue_poll2(queue_object* queue){
     
     if(queue==NULL || queue->next==NULL){
-        
         return NULL;
     }
     queue_object* object_to_find=queue->next;
@@ -126,6 +126,33 @@ void* queue_poll2(queue_object* queue){
 float response_rate(int waiting_time, int service_time){
     float rr = (waiting_time + service_time)/ service_time;
     return rr;
+}
+
+int queue_add_HRRN(process* new_obejct, queue_object* queue){
+    queue_object* new_queue_object= calloc(1,sizeof(queue_object));
+    if (new_queue_object==NULL){
+        return 1;
+    }
+    new_queue_object->object = new_obejct;
+    new_queue_object->next = NULL;
+    new_queue_object->time_left = new_obejct->time_left;
+
+
+	queue_object * prev = queue;  
+    while(prev->next != NULL){
+        prev->rr = response_rate(prev->waiting_time, prev->service_time);
+        prev = prev->next;
+    }
+
+    queue_object * prev2 = queue;  
+    while(prev2->next != NULL && prev2->next->rr > new_queue_object->rr){ //slides the newly added element through the queue until it reaches its correct position
+    	prev=prev->next;		
+    }
+	queue_object * tmp = prev->next;
+    prev->next = new_queue_object;
+    new_queue_object->next = tmp;
+
+	return 0;
 }
 
 void HRRN_rearrange(queue_object* queue){
@@ -152,14 +179,12 @@ void HRRN_rearrange(queue_object* queue){
     front->next = prev2->next;
     prev2->next = front;
 
-    queue_object * prev3 = queue;
-
-    while(prev3->next != NULL && prev3->next->rr != front->rr){
-        prev3 = prev3->next;
+    while(queue->next != NULL && queue->next->rr != front->rr){
+        queue = queue->next;
     }
 
-    queue_object * temp = prev3;
-    free(prev3->next);
-    prev3->next = prev3->next->next;
+    void * temp = queue->next->object;
+    queue->next = queue->next->next;
+    free(temp);
     
 }
