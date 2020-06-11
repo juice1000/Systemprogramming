@@ -106,6 +106,18 @@ queue_object* new_queue(){
     return new_queue;
 }
 
+queue_object** new_level_queue(){
+    int num_queues = 4;
+    queue_object** MLF_queue = malloc(sizeof(queue_object*)*4);
+	
+    //initialize queues
+    for(int i = 0; i < num_queues; i++){
+        MLF_queue[i] = new_queue();
+        
+    }
+
+    return MLF_queue;
+}
 
 void free_queue(queue_object* queue){
     queue_object* obj_to_delete=queue->next;
@@ -141,66 +153,6 @@ void* queue_poll2(queue_object* queue){
     return object;
 }
 
-/*void HRRN_rearrange(queue_object* queue){
-    //printf("hello from rearrange\n");
-    queue_object * prev = queue; 
-    queue_object* MAX = malloc(sizeof(queue_object));
-    queue_object* prev0 = malloc(sizeof(queue_object));
-    MAX->rr = 0.0;
-    while(prev->next != NULL){
-        printf("                                             waitingtime = %d\n",prev->next->waiting_time);
-        float servicetime = prev->next->service_time;
-        float waitingtime = prev->next->waiting_time;
-        prev->next->rr = (servicetime + waitingtime) / (servicetime);
-        if (prev->next->rr > MAX->rr){
-            MAX->rr = prev->next->rr;
-            MAX = prev->next;
-            prev0 = prev;
-        }
-        prev = prev->next;
-    }
-    prev0->next = prev0->next->next;
-    prev->next = MAX->next;
-    MAX->next = NULL;
-}
-
-int update_waiting_time(queue_object* queue , int Currenttime){
-    //printf("hello from updatingtime\n");
-    queue_object* runner = queue->next;
-    
-    //printf("                                   id =%d\n",runner->id);
-    while(runner != NULL){
-        int Start_time = runner->start_time;
-        printf("                                 Currenttime = %d\n",Currenttime);
-        printf("                                 start_time = %d\n",Start_time);
-        runner->waiting_time = Currenttime - Start_time;
-        printf("waiting time =%d\n",runner->waiting_time);
-        runner = runner->next;
-    }
-    Currenttime++;
-    return Currenttime;
-}
-void* insertionsort(queue_object* queue){
-    if(queue->next != NULL){
-        queue_object* Zeiger = queue->next;
-        while(Zeiger->next != NULL){
-            queue_object* comparer = Zeiger->next;
-            if(Zeiger->rr > comparer->rr){
-                queue_object* temp = queue;
-                while(temp->next->rr > comparer->rr){
-                    temp = temp->next;
-                }
-                queue_object* temp_Zeiger = Zeiger->next;
-                Zeiger->next = Zeiger->next->next;
-                queue_object* temp2 = temp->next;
-                temp->next = temp_Zeiger;
-                comparer->next = temp2;
-            }
-            Zeiger = Zeiger->next;
-        }
-    }
-    return 0;
-}*/
 
 void update_HRRN(queue_object* queue){
     queue_object* temp = queue;

@@ -54,6 +54,7 @@ void* queue_poll(queue_object* queue);
  * @result a pointer to a new queue handler.
  */
 queue_object* new_queue();
+queue_object** new_level_queue();
 
 /**
  * deletes and frees all queue items
