@@ -11,6 +11,8 @@ typedef struct _queue_object{
     int service_time;
     int waiting_time;
     float rr;
+    int start_time;
+    int id;
 }queue_object;
 
 /**
@@ -26,9 +28,19 @@ int queue_add_SRTNP(process* new_obejct, queue_object* queue);
 
 void* queue_poll2(queue_object* queue);
 
-float response_rate(int waiting_time, int service_time);
+//void HRRN_rearrange(queue_object* queue);
 
-void HRRN_rearrange(queue_object* queue);
+int queue_add_HRRN(process* new_obejct, queue_object* queue);
+
+void* queue_poll_HRRN(queue_object* queue);
+
+void update_HRRN(queue_object* queue);
+
+void test_waiting_time(queue_object* queue);
+
+//int update_waiting_time(queue_object* queue , int Currenttime);
+
+//int Currenttime = 0;
 
 /**
  * gets and deletes the oldest item from the queue

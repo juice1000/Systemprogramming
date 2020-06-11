@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 queue_object* HRRN_queue;
+//int Currenttime;
 //You can add more global variables and structs here
 
 /**
