@@ -36,6 +36,7 @@ void* queue_poll_HRRN(queue_object* queue);
 
 void update_HRRN(queue_object* queue);
 
+void test_waiting_time(queue_object* queue);
 
 //int update_waiting_time(queue_object* queue , int Currenttime);
 

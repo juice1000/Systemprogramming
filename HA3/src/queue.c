@@ -213,9 +213,18 @@ void update_HRRN(queue_object* queue){
     }
 }
 
+void test_waiting_time(queue_object* queue){
+    queue_object* temp = queue;
+
+    while(temp->next != NULL){
+        printf("waiting time after update is %d and id is %d\n",temp->next->waiting_time,temp->next->id);
+        temp = temp->next;
+    }
+}
+
 void* queue_poll_HRRN(queue_object* queue){
     //printf("hello from poll\n");
-    if(queue==NULL || queue->next==NULL){
+    if(queue->next==NULL){
         return NULL;
     }
     queue_object* object_to_find=queue;
@@ -227,7 +236,7 @@ void* queue_poll_HRRN(queue_object* queue){
         float servicetime = object_to_find->service_time;
         float waitingtime = object_to_find->waiting_time;
         object_to_find->rr = (servicetime + waitingtime) / (servicetime);
-        printf("w is %d",object_to_find->waiting_time);
+        
     }
     object_to_find = queue;
     previous_object = queue;

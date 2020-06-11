@@ -4,15 +4,17 @@
 
 
 process* HRRN_tick (process* running_process){
-    
+    update_HRRN(HRRN_queue);
     if (running_process==NULL || running_process->time_left==0){
+        //update_HRRN(HRRN_queue);
         running_process = queue_poll_HRRN(HRRN_queue);
         
         
     }
     if (running_process!=NULL){
         
-        update_HRRN(HRRN_queue);
+        //update_HRRN(HRRN_queue);
+        //test_waiting_time(HRRN_queue);
         //Currenttime++;
         running_process->time_left--;
     }
