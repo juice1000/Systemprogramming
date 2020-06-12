@@ -6,21 +6,15 @@
 process* HRRN_tick (process* running_process){
     update_HRRN(HRRN_queue);
     if (running_process==NULL || running_process->time_left==0){
-        //update_HRRN(HRRN_queue);
         running_process = queue_poll_HRRN(HRRN_queue);
         
         
     }
     if (running_process!=NULL){
-        
-        //update_HRRN(HRRN_queue);
-        //test_waiting_time(HRRN_queue);
-        //Currenttime++;
         running_process->time_left--;
     }
     return running_process;
 }
-// Problem ist, dass es sich zum gelichen Zeit nur ein Eement im Queue befindet
 int HRRN_startup(){
     HRRN_queue=new_queue();
     if (HRRN_queue==NULL){
