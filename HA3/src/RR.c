@@ -2,8 +2,6 @@
 #include <stdio.h>
 
 process* RR_tick (process* running_process){
-
-    //printf("\ntime_left_quantum = %d and this quantum = %d\n",time_left_quantum,this_quantum);
     if (running_process==NULL || running_process->time_left==0){
         time_left_quantum = this_quantum;
         running_process = queue_poll(RR_queue);

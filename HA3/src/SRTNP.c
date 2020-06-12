@@ -13,7 +13,6 @@ process* SRTNP_tick (process* running_process){
         
         if(running_process->time_left > front_process->time_left){
             queue_add_SRTNP(running_process,SRTNP_queue);
-            //printf("Process %d has remining time: %d \n", running_process->id, running_process->time_left);
             running_process=queue_poll(SRTNP_queue);
         }
     }

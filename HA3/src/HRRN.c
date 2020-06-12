@@ -7,8 +7,6 @@ process* HRRN_tick (process* running_process){
     update_HRRN(HRRN_queue);
     if (running_process==NULL || running_process->time_left==0){
         running_process = queue_poll_HRRN(HRRN_queue);
-        
-        
     }
     if (running_process!=NULL){
         running_process->time_left--;
