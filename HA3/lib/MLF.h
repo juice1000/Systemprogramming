@@ -4,8 +4,11 @@
 #include "process.h"
 #include <stdlib.h>
 
-queue_object* MLF_queue;
-//You can add more global variables here
+queue_object** MLF_queue;
+int time_left_quantum;
+int level;
+#define level_num 4
+
 
 /**
  * determine which is the current process to be processed. 

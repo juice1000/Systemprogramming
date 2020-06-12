@@ -97,6 +97,18 @@ queue_object* new_queue(){
     return new_queue;
 }
 
+queue_object** new_level_queue(){
+    int num_queues = 4;
+    queue_object** MLF_queue = malloc(sizeof(queue_object*)*4);
+	
+    //initialize queues
+    for(int i = 0; i < num_queues; i++){
+        MLF_queue[i] = new_queue();
+        
+    }
+
+    return MLF_queue;
+}
 
 void free_queue(queue_object* queue){
     queue_object* obj_to_delete=queue->next;
