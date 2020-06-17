@@ -74,20 +74,28 @@ void * Scenario_Main(void * scenario_p)
 {
 	// TODO BEGIN
 	// B) Implement basic structure, no synchronization yet!
+	Scenario * scen;
+	scen = Scenario_Create(&scen->args);
+	Person * pers = Scenario_GetPersons(scen);
+	int infec = Scenario_GetInfected(scen, time); //what time??
 	// D) Finish up this function, use the synchronization data in args struct!
 
 	// get scenario pointer
 
 	while (true)
 	{	
+		
 		// wait for next iteration
+		infec = Scenario_UpdateInfections(pers, time);
 
 		// check for preemptive exit
 
 		// calculate next state
+		Scenario_NextState(scen);
 
 		// signal worker done
 	}
+	Scenario_DataDestroy(scen);
 
 	// TODO END
 	return NULL;
