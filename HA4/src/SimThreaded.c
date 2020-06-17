@@ -331,6 +331,7 @@ static void Sim_Init(Sim *sim, int argc, char **argv)
 
 	for (i = 0; i < SCENARIO_NUM; i++)
 	{
+		
 		// TODO BEGIN
 		sim->states[i] = WAITING;
 		sim->args[i].state = &sim->states[i];
