@@ -10,9 +10,9 @@ SRCS = \
 	${SRC_DIR}/Scenario.c\
 	${SRC_DIR}/Utils.c\
 	${SRC_DIR}/CSV.c\
-#	${SRC_DIR}/GUI.c
-# LFLAGS += `$(SDL_CONFIG_BIN) --libs` -lSDL2_image 
-# CFLAGS += `$(SDL_CONFIG_BIN) --cflags` 
+	${SRC_DIR}/GUI.c
+LFLAGS += `$(SDL_CONFIG_BIN) --libs` -lSDL2_image 
+CFLAGS += `$(SDL_CONFIG_BIN) --cflags` 
 
 # Uncomment the above 3 lines if you want to use GUI mode.
 # Recompile the whole project with `make clean all`

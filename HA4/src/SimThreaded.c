@@ -42,8 +42,15 @@ struct Sim
 
 	// TODO BEGIN
 	// A) Create variable to store thread reference
+	pthread_t scn_thread[SCENARIO_NUM];
+	// array pids[scenario_num]
+
 
 	// C) Create mutex and signal variables for synchronisation
+	pthread_cond_t new_sim_cond[SCENARIO_NUM];
+	pthread_mutex_t new_sim_mutex[SCENARIO_NUM];
+	// array for mutexes
+	// array for conds
 
 	// TODO END
 };
@@ -225,6 +232,10 @@ static void Sim_Cleanup(Sim *sim)
 	// TODO BEGIN
 
 	// A) Wait for threads to end
+	for (int i = 0; i < SCENARIO_NUM; i++){
+        pthread_join(sim->scn_thread[i], NULL);
+	}
+
 	// C) Handle mutexes and signals!
 
 	// TODO END
@@ -323,8 +334,22 @@ static void Sim_Init(Sim *sim, int argc, char **argv)
 		// TODO BEGIN
 		sim->states[i] = WAITING;
 		sim->args[i].state = &sim->states[i];
+
 		// C) Handl mutexe and signals
+		//pthread_mutex_init(&new_sim_mutex, NULL);
+		//pthread_cond_init(&new_sim_cond, NULL);
+
 		// A) Start threads, save reference in sim
+		// store in s[i] correct??
+		//sim->s[i] = pthread_create(&sim->scn_thread[i], NULL, Scenario_Create(&sim->args[i]), NULL); // scn_thread saves pids, but is referencing correct??, NULL as 4th arg rly?? 
+		
+		sim->s[i] = Scenario_Create(&sim->args[i]); //-> working example from Sim.c
+		//pthread_t *t_scn1;
+		//pthread_t *t_scn2;
+		//pthread_t *t_scn3;
+		//pthread_t ping
+		//pthread_create(..., main[scenario], ...)
+		
 		// TODO END
 	}
 }

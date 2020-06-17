@@ -7,7 +7,7 @@
  */
 // Uncomment the line below to enable GUI mode. You have to install SDL2 first!
 // Recompile with `make clean all` after uncommenting or commenting out this macro!
-//#define GUI_MODE
+#define GUI_MODE
 
 // Uncomment only one of these to use different predefined settings. Comment
 // out all 4 lines to use your own defined settings.
