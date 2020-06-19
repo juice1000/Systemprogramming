@@ -341,9 +341,10 @@ static void Sim_Init(Sim *sim, int argc, char **argv)
 
 		// A) Start threads, save reference in sim
 		// store in s[i] correct??
-		//sim->s[i] = pthread_create(&sim->scn_thread[i], NULL, Scenario_Create(&sim->args[i]), NULL); // scn_thread saves pids, but is referencing correct??, NULL as 4th arg rly?? 
+		sim->s[i] = Scenario_Create(&sim->args[i]);
+		pthread_create(&sim->scn_thread[i], NULL, Scenario_Main, sim->s[i]); // scn_thread saves pids, but is referencing correct??, NULL as 4th arg rly?? 
 		
-		sim->s[i] = Scenario_Create(&sim->args[i]); //-> working example from Sim.c
+		//sim->s[i] = Scenario_Create(&sim->args[i]); //-> working example from Sim.c
 		//pthread_t *t_scn1;
 		//pthread_t *t_scn2;
 		//pthread_t *t_scn3;
