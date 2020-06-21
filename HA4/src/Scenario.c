@@ -70,33 +70,38 @@ void Scenario_DataDestroy(Scenario *scenario)
 }
 
 
+// Gets stuck inbetween and needs to be killed :(
 void * Scenario_Main(void * scenario_p)
 {
 	// TODO BEGIN
 	// B) Implement basic structure, no synchronization yet!
-	//Scenario * scen;
-	
 	//fprintf( stderr, "fail");
+
 	scenario_p = (Scenario*)scenario_p;
-	//Person * pers = Scenario_GetPersons(scen);
-	//int infec = Scenario_GetInfected(scen, time); //what time??
+	//Args *args = malloc(sizeof(Args));
+
 	// D) Finish up this function, use the synchronization data in args struct!
 
 	// get scenario pointer
 
 	while (true)
 	{	
-		
+		pthread_mutex_lock(&scenario_p->args.new_sim_mutex);
 		// wait for next iteration
-		//infec = Scenario_UpdateInfections(pers, time);
-
+		while(iteration_calc has not increased){ // how to check??
+			pthread_cond_wait(args->new_sim_cond, args->new_sim_mutex);
+		}
 		// check for preemptive exit
+		//Scenario_GetInfected returns -1 if no match with time
+
+		pthread_mutex_unlock(args->new_sim_mutex);
 
 		// calculate next state
 		Scenario_NextState(scenario_p);
 		
 
 		// signal worker done
+		pthread_cond_signal(args->new_sim_cond);
 	}
 	Scenario_DataDestroy(scenario_p);
 

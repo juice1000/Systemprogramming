@@ -224,6 +224,10 @@ static void Sim_CalcActiveIteration(Sim *sim)
 	// TODO BEGIN
 	// D) Implement this function: Invoke the scenario threads
 	//    Wait for scenario threads to finish one iteration.
+
+	// invoke == join?? then what is cleanup? then what is end?
+	// how to check for finished iteration?
+	
 	// TODO END
 }
 
@@ -237,6 +241,10 @@ static void Sim_Cleanup(Sim *sim)
 	}
 
 	// C) Handle mutexes and signals!
+	for (int i = 0; i < SCENARIO_NUM; i++){
+        int pthread_mutex_destroy(pthread_mutex_t *new_sim_mutex);
+		int pthread_mutex_destroy(pthread_mutex_t *new_sim_cond);
+	}
 
 	// TODO END
 	
@@ -289,6 +297,9 @@ static void Sim_End(Sim *sim)
 	sim->running = false;
 	// TODO BEGIN
 	// D) Signal threads to finish!
+	for (int i = 0; i < SCENARIO_NUM; i++){
+        pthread_exit(NULL); // Not sure if that's correct
+	}
 
 	// TODO END
 }
@@ -336,21 +347,14 @@ static void Sim_Init(Sim *sim, int argc, char **argv)
 		sim->states[i] = WAITING;
 		sim->args[i].state = &sim->states[i];
 
-		// C) Handl mutexe and signals
-		//pthread_mutex_init(&new_sim_mutex, NULL);
-		//pthread_cond_init(&new_sim_cond, NULL);
+		// C) Handle mutexe and signals
+		pthread_mutex_init(&sim->new_sim_mutex[i], NULL);
+		pthread_cond_init(&sim->new_sim_cond[i], NULL);
 
 		// A) Start threads, save reference in sim
-		// store in s[i] correct??
+
 		sim->s[i] = Scenario_Create(&sim->args[i]);
-		pthread_create(&sim->scn_thread[i], NULL, Scenario_Main, sim->s[i]); // scn_thread saves pids, but is referencing correct??, NULL as 4th arg rly?? 
-		
-		//sim->s[i] = Scenario_Create(&sim->args[i]); //-> working example from Sim.c
-		//pthread_t *t_scn1;
-		//pthread_t *t_scn2;
-		//pthread_t *t_scn3;
-		//pthread_t ping
-		//pthread_create(..., main[scenario], ...)
+		pthread_create(&sim->scn_thread[i], NULL, Scenario_Main, sim->s[i]);
 		
 		// TODO END
 	}
