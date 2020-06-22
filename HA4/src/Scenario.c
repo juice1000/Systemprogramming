@@ -9,6 +9,7 @@
 
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h> // for memcpy
 #include <math.h>
 #include <pthread.h>
@@ -16,6 +17,7 @@
 #include "Utils.h"
 #include "Params.h"
 #include "Scenario.h"
+
 
 /**
  * @brief Representation for one scenario.
@@ -76,9 +78,8 @@ void * Scenario_Main(void * scenario_p)
 	// TODO BEGIN
 	// B) Implement basic structure, no synchronization yet!
 	//fprintf( stderr, "fail");
-
-	scenario_p = (Scenario*)scenario_p;
-	//Args *args = malloc(sizeof(Args));
+	
+	Scenario *scenario = scenario_p;
 
 	// D) Finish up this function, use the synchronization data in args struct!
 
@@ -86,24 +87,32 @@ void * Scenario_Main(void * scenario_p)
 
 	while (true)
 	{	
-		pthread_mutex_lock(&scenario_p->args.new_sim_mutex);
-		// wait for next iteration
-		while(iteration_calc has not increased){ // how to check??
-			pthread_cond_wait(args->new_sim_cond, args->new_sim_mutex);
-		}
-		// check for preemptive exit
-		//Scenario_GetInfected returns -1 if no match with time
+		
+		pthread_mutex_lock(scenario->args.new_sim_mutex);
 
-		pthread_mutex_unlock(args->new_sim_mutex);
+		// wait for next iteration
+		while(*scenario->args.state == WAITING){
+				pthread_cond_wait(scenario->args.new_sim_cond, scenario->args.new_sim_mutex);
+		}
+		
+		// check for preemptive exit
+		if(*scenario->args.state == FINISHED || *scenario->args.state == EXIT){
+			pthread_mutex_unlock(scenario->args.new_sim_mutex);
+			break;
+		}
+
+		*scenario->args.state = WORKING;
 
 		// calculate next state
-		Scenario_NextState(scenario_p);
-		
+		Scenario_NextState(scenario);
 
 		// signal worker done
-		pthread_cond_signal(args->new_sim_cond);
+		pthread_cond_signal(scenario->args.new_sim_cond); // different waiting
+		*scenario->args.state = WAITING;
+
+		pthread_mutex_unlock(scenario->args.new_sim_mutex);
 	}
-	Scenario_DataDestroy(scenario_p);
+	Scenario_DataDestroy(scenario);
 
 	// TODO END
 	return NULL;

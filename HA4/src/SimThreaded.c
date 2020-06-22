@@ -43,14 +43,11 @@ struct Sim
 	// TODO BEGIN
 	// A) Create variable to store thread reference
 	pthread_t scn_thread[SCENARIO_NUM];
-	// array pids[scenario_num]
 
 
 	// C) Create mutex and signal variables for synchronisation
 	pthread_cond_t new_sim_cond[SCENARIO_NUM];
 	pthread_mutex_t new_sim_mutex[SCENARIO_NUM];
-	// array for mutexes
-	// array for conds
 
 	// TODO END
 };
@@ -225,8 +222,15 @@ static void Sim_CalcActiveIteration(Sim *sim)
 	// D) Implement this function: Invoke the scenario threads
 	//    Wait for scenario threads to finish one iteration.
 
-	// invoke == join?? then what is cleanup? then what is end?
-	// how to check for finished iteration?
+	for (int i=0; i<SCENARIO_NUM; i++){
+		pthread_mutex_lock(sim->args[i].new_sim_mutex);
+		if(sim->states[i] == WORKING){
+			pthread_cond_wait(sim->args[i].new_sim_cond, sim->args[i].new_sim_mutex);
+		}
+		pthread_mutex_unlock(sim->args[i].new_sim_mutex);
+		sim->states[i] = NEXT_STATE;
+
+	}
 	
 	// TODO END
 }
@@ -234,7 +238,7 @@ static void Sim_CalcActiveIteration(Sim *sim)
 static void Sim_Cleanup(Sim *sim)
 {
 	// TODO BEGIN
-
+	printf("Inside Cleanup\n");
 	// A) Wait for threads to end
 	for (int i = 0; i < SCENARIO_NUM; i++){
         pthread_join(sim->scn_thread[i], NULL);
@@ -242,8 +246,8 @@ static void Sim_Cleanup(Sim *sim)
 
 	// C) Handle mutexes and signals!
 	for (int i = 0; i < SCENARIO_NUM; i++){
-        int pthread_mutex_destroy(pthread_mutex_t *new_sim_mutex);
-		int pthread_mutex_destroy(pthread_mutex_t *new_sim_cond);
+        pthread_mutex_destroy(&sim->new_sim_mutex[i]);
+		pthread_cond_destroy(&sim->new_sim_cond[i]);
 	}
 
 	// TODO END
@@ -294,11 +298,13 @@ static int Sim_CLIParseSim(Sim *sim, int argc, char **argv)
 
 static void Sim_End(Sim *sim)
 {
+	printf("Inside End\n");
 	sim->running = false;
 	// TODO BEGIN
 	// D) Signal threads to finish!
+
 	for (int i = 0; i < SCENARIO_NUM; i++){
-        pthread_exit(NULL); // Not sure if that's correct
+        sim->states[i] = FINISHED;
 	}
 
 	// TODO END
@@ -350,6 +356,8 @@ static void Sim_Init(Sim *sim, int argc, char **argv)
 		// C) Handle mutexe and signals
 		pthread_mutex_init(&sim->new_sim_mutex[i], NULL);
 		pthread_cond_init(&sim->new_sim_cond[i], NULL);
+		sim->args[i].new_sim_mutex = &sim->new_sim_mutex[i];
+		sim->args[i].new_sim_cond = &sim->new_sim_cond[i];
 
 		// A) Start threads, save reference in sim
 
