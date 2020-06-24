@@ -54,6 +54,7 @@ struct Args
 	// TODO BEGIN
 	// C) Add pointers to mutexes and signals used in scenario threads
 	pthread_cond_t *new_sim_cond;
+	pthread_cond_t *done_cond;
 	pthread_mutex_t *new_sim_mutex;
 	// TODO END
 };

@@ -46,6 +46,7 @@ struct Sim
 
 	// C) Create mutex and signal variables for synchronisation
 	pthread_cond_t new_sim_cond[SCENARIO_NUM];
+	pthread_cond_t done_cond[SCENARIO_NUM];
 	pthread_mutex_t new_sim_mutex[SCENARIO_NUM];
 
 	// TODO END
@@ -217,17 +218,27 @@ static void Sim_CalcActiveIteration(Sim *sim)
 	// TODO BEGIN
 	// D) Implement this function: Invoke the scenario threads
 	//    Wait for scenario threads to finish one iteration.
+	for (int i=0; i<SCENARIO_NUM; i++){
+		pthread_mutex_lock(sim->args[i].new_sim_mutex);
+
+		sim->states[i] = NEXT_STATE;
+		pthread_cond_signal(&sim->new_sim_cond[i]);
+		pthread_mutex_unlock(sim->args[i].new_sim_mutex);
+
+	}
+
+	// new_state = new_sim_cond
+	// iteration_fin = done_cond
 
 	for (int i=0; i<SCENARIO_NUM; i++){
 		pthread_mutex_lock(sim->args[i].new_sim_mutex);
-		if(sim->states[i] == WORKING){
-			pthread_cond_wait(sim->args[i].new_sim_cond, sim->args[i].new_sim_mutex);
+
+		while(sim->states[i] != WAITING){
+			pthread_cond_wait(sim->args[i].done_cond, sim->args[i].new_sim_mutex);
 		}
-		pthread_cond_signal(&sim->new_sim_cond[i]);
-		sim->states[i] = NEXT_STATE;
+		
 		pthread_mutex_unlock(sim->args[i].new_sim_mutex);
 		
-
 	}
 	
 	// TODO END
@@ -247,6 +258,11 @@ static void Sim_Cleanup(Sim *sim)
         pthread_mutex_destroy(&sim->new_sim_mutex[i]);
 		pthread_cond_destroy(&sim->new_sim_cond[i]);
 	}
+
+	for (int i = 0; i < SCENARIO_NUM; i++){
+        Scenario_DataDestroy(sim->s[i]);
+	}
+	
 
 	// TODO END
 	
@@ -352,8 +368,10 @@ static void Sim_Init(Sim *sim, int argc, char **argv)
 		// C) Handle mutexe and signals
 		pthread_mutex_init(&sim->new_sim_mutex[i], NULL);
 		pthread_cond_init(&sim->new_sim_cond[i], NULL);
+		pthread_cond_init(&sim->done_cond[i], NULL);
 		sim->args[i].new_sim_mutex = &sim->new_sim_mutex[i];
 		sim->args[i].new_sim_cond = &sim->new_sim_cond[i];
+		sim->args[i].done_cond = &sim->done_cond[i];
 
 		// A) Start threads, save reference in sim
 

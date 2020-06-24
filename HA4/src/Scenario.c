@@ -88,8 +88,8 @@ void * Scenario_Main(void * scenario_p)
 
 		// wait for next iteration
 		while(*scenario->args.state == WAITING){
-				pthread_cond_wait(scenario->args.new_sim_cond, scenario->args.new_sim_mutex);
-		}
+			pthread_cond_wait(scenario->args.new_sim_cond, scenario->args.new_sim_mutex);
+		} // new_state
 		
 		// check for preemptive exit
 		if(*scenario->args.state == FINISHED || *scenario->args.state == EXIT){
@@ -101,14 +101,13 @@ void * Scenario_Main(void * scenario_p)
 
 		// calculate next state
 		Scenario_NextState(scenario);
-
+		
 		// signal worker done
-		pthread_cond_signal(scenario->args.new_sim_cond); // different waiting
 		*scenario->args.state = WAITING;
+		pthread_cond_signal(scenario->args.done_cond); // cond_waiting
 
 		pthread_mutex_unlock(scenario->args.new_sim_mutex);
 	}
-	Scenario_DataDestroy(scenario);
 
 	// TODO END
 	return NULL;
