@@ -1,8 +1,8 @@
 /**
  * @file SimThreaded.c
  * @brief Multi-threaded simulation of different distancing scenarios.
- * @version 1.0
- * @date 2020-06-13
+ * @version 1.1
+ * @date 2020-06-21
  * 
  */
 
@@ -44,7 +44,6 @@ struct Sim
 	// A) Create variable to store thread reference
 	pthread_t scn_thread[SCENARIO_NUM];
 
-
 	// C) Create mutex and signal variables for synchronisation
 	pthread_cond_t new_sim_cond[SCENARIO_NUM];
 	pthread_mutex_t new_sim_mutex[SCENARIO_NUM];
@@ -58,11 +57,10 @@ struct Sim
 
 /** 
  * Initialize the argument struct array with the values for each
- * scenario. Should be called by Sim_Init(), after SIM_CLIParse().
- * NEW: Starts the scenarion threads.
+ * scenario. Should be called by Sim_CLIParseSim().
  * @param args array of size SCENARIO_NUM
  * @param iteration_num number of total iterations
- * @param argc return value of Sim_CLIParseSim()
+ * @param argc from main(argc, argv)
  * @param argv from main(argc, argv)
  */
 static void Sim_ArgsInit(Args *args, int iteration_num, int argc, char **argv);
@@ -94,20 +92,18 @@ static int Sim_CLIHasHelpFlag(int argc, char** argv);
 /**
  * Parse CLI for scenario parameters. Should be called by Sim_ArgsInit().
  * @param sim initialized simulation
- * @param argc return value of Sim_CLIParseScenarioArgs()
- * @param argv main(argc, argv)
- * @return First argv index not parsed by this function 
+ * @param argc from main(argc, argv)
+ * @param argv from main(argc, argv)
  */
-static int Sim_CLIParseScenarioArgs(Args *args, int argc, char **argv);
+static void Sim_CLIParseScenarioArgs(Args *args, int argc, char **argv);
 
 /**
  * Parse CLI for simluation parameters. Should be called by Sim_Init().
  * @param sim initialized simulation
  * @param argc from main(argc, argv)
  * @param argv from main(argc, argv)
- * @return First argv index not parsed by this function 
  */
-static int Sim_CLIParseSim(Sim *sim, int argc, char **argv);
+static void Sim_CLIParseSim(Sim *sim, int argc, char **argv);
 
 /**
  * Set the simulation to end in the next iteration.
@@ -227,8 +223,10 @@ static void Sim_CalcActiveIteration(Sim *sim)
 		if(sim->states[i] == WORKING){
 			pthread_cond_wait(sim->args[i].new_sim_cond, sim->args[i].new_sim_mutex);
 		}
-		pthread_mutex_unlock(sim->args[i].new_sim_mutex);
+		pthread_cond_signal(&sim->new_sim_cond[i]);
 		sim->states[i] = NEXT_STATE;
+		pthread_mutex_unlock(sim->args[i].new_sim_mutex);
+		
 
 	}
 	
@@ -238,7 +236,7 @@ static void Sim_CalcActiveIteration(Sim *sim)
 static void Sim_Cleanup(Sim *sim)
 {
 	// TODO BEGIN
-	printf("Inside Cleanup\n");
+
 	// A) Wait for threads to end
 	for (int i = 0; i < SCENARIO_NUM; i++){
         pthread_join(sim->scn_thread[i], NULL);
@@ -278,35 +276,38 @@ static int Sim_CLIHasHelpFlag(int argc, char** argv)
 	return false;
 }
 
-static int Sim_CLIParseScenarioArgs(Args *args, int argc, char **argv)
+static void Sim_CLIParseScenarioArgs(Args *args, int argc, char **argv)
 {
-	if (argc > SCENARIO_NUM) argc = SCENARIO_NUM;
-	for (argc = MIN (argc, SCENARIO_NUM); argc > 0; --argc)
+	int i;
+	const int arg_offset = 3;
+	for (i = arg_offset; i < argc; i++)
 	{
-		args[SCENARIO_NUM - argc].distancing_perc = strtof(*argv, NULL);
-		argv++;
+		// keep distancing perc in range [0,100]
+		args[i - arg_offset].distancing_perc = MAX(0.0, MIN(100.0, strtof(argv[i], NULL) ));
 	}
-	return argc;
 }
 
-static int Sim_CLIParseSim(Sim *sim, int argc, char **argv)
+static void Sim_CLIParseSim(Sim *sim, int argc, char **argv)
 {
 	if (argc >= 3) sim->iteration_num = strtol(argv[2], NULL, 10);
 	if (argc >= 2) sim->seed = strtol(argv[1], NULL, 10);
-	return MIN (argc - 2, 0);
+
+	Sim_ArgsInit(sim->args, sim->iteration_num, argc, argv);
 }
 
 static void Sim_End(Sim *sim)
 {
-	printf("Inside End\n");
 	sim->running = false;
 	// TODO BEGIN
-	// D) Signal threads to finish!
+	// D) Implement this function: Invoke the scenario threads
+	//    Wait for scenario threads to finish one iteration.
 
 	for (int i = 0; i < SCENARIO_NUM; i++){
+		pthread_mutex_lock(&sim->new_sim_mutex[i]);
         sim->states[i] = FINISHED;
+		pthread_cond_signal(&sim->new_sim_cond[i]);
+		pthread_mutex_unlock(&sim->new_sim_mutex[i]);
 	}
-
 	// TODO END
 }
 
@@ -328,16 +329,13 @@ static void Sim_Init(Sim *sim, int argc, char **argv)
 	// Initialize Simulation
 	sim->iteration_num = SIM_DEFAULT_ITERATION_NUM;
 	sim->running = true;
-	argc = Sim_CLIParseSim(sim, argc, argv);
+	Sim_CLIParseSim(sim, argc, argv);
 
-	// set up Args structs for each Scenario
-	Sim_ArgsInit(sim->args, sim->iteration_num, argc, argv);
-	argc = Sim_CLIParseScenarioArgs(sim->args, argc, argv);
 
 	// initialize simulation output	
-	#ifdef GUI_MODE  // output as CSV
+	#ifdef GUI_MODE // output as GUI
 		sim->gui = GUI_Create();
-	#else         // output as GUI
+	#else  // output as CSV
 		float distancing_pers[SCENARIO_NUM];
 		for (i = 0; i < SCENARIO_NUM; ++i)
 		{
@@ -348,11 +346,9 @@ static void Sim_Init(Sim *sim, int argc, char **argv)
 
 	for (i = 0; i < SCENARIO_NUM; i++)
 	{
-		
 		// TODO BEGIN
 		sim->states[i] = WAITING;
 		sim->args[i].state = &sim->states[i];
-
 		// C) Handle mutexe and signals
 		pthread_mutex_init(&sim->new_sim_mutex[i], NULL);
 		pthread_cond_init(&sim->new_sim_cond[i], NULL);
@@ -364,7 +360,6 @@ static void Sim_Init(Sim *sim, int argc, char **argv)
 		sim->s[i] = Scenario_Create(&sim->args[i]);
 		pthread_create(&sim->scn_thread[i], NULL, Scenario_Main, sim->s[i]);
 		
-		// TODO END
 	}
 }
 

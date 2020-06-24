@@ -1,8 +1,8 @@
 /**
  * @file Sim.c
  * @brief Single threaded simulation of different distancing scenarios.
- * @version 1.0
- * @date 2020-06-13
+ * @version 1.1
+ * @date 2020-06-21
  * 
  */
 
@@ -45,10 +45,10 @@ struct Sim
 
 /** 
  * Initialize the argument struct array with the values for each
- * scenario. Should be called by Sim_Init(), after SIM_CLIParse().
+ * scenario. Should be called by Sim_CLIParseSim().
  * @param args array of size SCENARIO_NUM
  * @param iteration_num number of total iterations
- * @param argc return value of Sim_CLIParseSim()
+ * @param argc from main(argc, argv)
  * @param argv from main(argc, argv)
  */
 static void Sim_ArgsInit(Args *args, int iteration_num, int argc, char **argv);
@@ -78,20 +78,18 @@ static int Sim_CLIHasHelpFlag(int argc, char** argv);
 /**
  * Parse CLI for scenario parameters. Should be called by Sim_ArgsInit().
  * @param sim initialized simulation
- * @param argc return value of Sim_CLIParseScenarioArgs()
- * @param argv main(argc, argv)
- * @return First argv index not parsed by this function 
+ * @param argc from main(argc, argv)
+ * @param argv from main(argc, argv)
  */
-static int Sim_CLIParseScenarioArgs(Args *args, int argc, char **argv);
+static void Sim_CLIParseScenarioArgs(Args *args, int argc, char **argv);
 
 /**
- * Parse CLI for simluation parameters. Should be called by Sim_Init().
+ * Parse CLI for simluation parameters. Also sets up the Parameter struct. Should be called by Sim_Init().
  * @param sim initialized simulation
  * @param argc from main(argc, argv)
  * @param argv from main(argc, argv)
- * @return First argv index not parsed by this function 
  */
-static int Sim_CLIParseSim(Sim *sim, int argc, char **argv);
+static void Sim_CLIParseSim(Sim *sim, int argc, char **argv);
 
 /**
  * Set the simulation to end in the next iteration.
@@ -241,22 +239,23 @@ static int Sim_CLIHasHelpFlag(int argc, char** argv)
 	return false;
 }
 
-static int Sim_CLIParseScenarioArgs(Args *args, int argc, char **argv)
+static void Sim_CLIParseScenarioArgs(Args *args, int argc, char **argv)
 {
-	if (argc > SCENARIO_NUM) argc = SCENARIO_NUM;
-	for (argc = MIN (argc, SCENARIO_NUM); argc > 0; --argc)
+	int i;
+	const int arg_offset = 3;
+	for (i = arg_offset; i < argc; i++)
 	{
-		args[SCENARIO_NUM - argc].distancing_perc = strtof(*argv, NULL);
-		argv++;
+		// keep distancing perc in range [0,100]
+		args[i - arg_offset].distancing_perc = MAX(0.0, MIN(100.0, strtof(argv[i], NULL) ));
 	}
-	return argc;
 }
 
-static int Sim_CLIParseSim(Sim *sim, int argc, char **argv)
+static void Sim_CLIParseSim(Sim *sim, int argc, char **argv)
 {
 	if (argc >= 3) sim->iteration_num = strtol(argv[2], NULL, 10);
 	if (argc >= 2) sim->seed = strtol(argv[1], NULL, 10);
-	return MIN (argc - 2, 0);
+
+	Sim_ArgsInit(sim->args, sim->iteration_num, argc, argv);
 }
 
 static void Sim_End(Sim *sim)
@@ -282,11 +281,7 @@ static void Sim_Init(Sim *sim, int argc, char **argv)
 	// Initialize Simulation
 	sim->iteration_num = SIM_DEFAULT_ITERATION_NUM;
 	sim->running = true;
-	argc = Sim_CLIParseSim(sim, argc, argv);
-
-	// set up Args structs for each Scenario
-	Sim_ArgsInit(sim->args, sim->iteration_num, argc, argv);
-	argc = Sim_CLIParseScenarioArgs(sim->args, argc, argv);
+	Sim_CLIParseSim(sim, argc, argv);
 
 	// create Scenarios from Args struct
 	for (i = 0; i < SCENARIO_NUM; i++)

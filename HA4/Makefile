@@ -10,10 +10,10 @@ SRCS = \
 	${SRC_DIR}/Scenario.c\
 	${SRC_DIR}/Utils.c\
 	${SRC_DIR}/CSV.c\
-	${SRC_DIR}/GUI.c
-LFLAGS += `$(SDL_CONFIG_BIN) --libs` -lSDL2_image 
-CFLAGS += `$(SDL_CONFIG_BIN) --cflags` 
-
+#	${SRC_DIR}/GUI.c
+# LFLAGS += `$(SDL_CONFIG_BIN) --libs` -lSDL2_image 
+# CFLAGS += `$(SDL_CONFIG_BIN) --cflags`
+ 
 # Uncomment the above 3 lines if you want to use GUI mode.
 # Recompile the whole project with `make clean all`
 # You need to install SDL2 first!
@@ -34,7 +34,7 @@ OBJS_MT = $(OBJS) $(OBJ_MT)
 DEP = $(OBJS:%.o=%.d) $(OBJ_ST;%.o=%.d) $(OBJ_MT;%.o=%.d)
 
 CC	   = gcc
-CFLAGS += -g1 -Wall -Wextra -pedantic -std=c99 -lm -I${INCLUDE_DIR}
+CFLAGS += -g -Wall -Wextra -pedantic -std=c99 -lm -I${INCLUDE_DIR}
 LFLAGS += -lm -pthread
 
 RM     = rm -f

@@ -9,7 +9,6 @@
 
 #include <stdbool.h>
 #include <stdlib.h>
-#include <stdio.h>
 #include <string.h> // for memcpy
 #include <math.h>
 #include <pthread.h>
@@ -17,7 +16,6 @@
 #include "Utils.h"
 #include "Params.h"
 #include "Scenario.h"
-
 
 /**
  * @brief Representation for one scenario.
@@ -72,7 +70,6 @@ void Scenario_DataDestroy(Scenario *scenario)
 }
 
 
-// Gets stuck inbetween and needs to be killed :(
 void * Scenario_Main(void * scenario_p)
 {
 	// TODO BEGIN
@@ -87,7 +84,6 @@ void * Scenario_Main(void * scenario_p)
 
 	while (true)
 	{	
-		
 		pthread_mutex_lock(scenario->args.new_sim_mutex);
 
 		// wait for next iteration
