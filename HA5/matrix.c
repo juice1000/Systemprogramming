@@ -2,6 +2,15 @@
 
 matrix* create_matrix(unsigned int m, unsigned int n, int* numbers)
 {
+	struct matrix *matrix = malloc(sizeof(struct matrix)*n*m);
+
+	matrix->m = m;
+	matrix->n = n;
+	matrix->elements = malloc(sizeof(int)*m*n);
+	for (int i = 0; i < n*m; i++){
+		matrix->elements[i] = numbers[i];
+	}
+
 	/*TODO:
 			-Argumente auf Gueltigkeit ueberpruefen
 			-neue Matrix erstellen und zurueckgeben (Pointer!!!)
@@ -9,7 +18,7 @@ matrix* create_matrix(unsigned int m, unsigned int n, int* numbers)
 			  Dies ist für die automatischen Tests unerlaesslich)
 	*/
 
-	return NULL;
+	return matrix;
 }
 
 matrix* create_matrix_from_row(unsigned int m, unsigned int row_nr, matrix* row)
@@ -28,8 +37,14 @@ void free_matrix(matrix* matrix)
 	/*TODO:
 			-Argumente auf Gueltigkeit ueberpruefen
 			-Matrix und alle dynamisch reservierten elemente der Matrix freigeben
-	*/
-	
+	*/	
+
+	//free(matrix->elements); --> gives segmentation fault
+	//int size = sizeof(matrix->elements)/sizeof(int);
+	//for (int i = 0; i <size; i++){
+	//	free(matrix->elements[i]);
+	//}
+	free(matrix);
 }
 
 matrix* duplicate_matrix(matrix* old)
@@ -38,8 +53,15 @@ matrix* duplicate_matrix(matrix* old)
 			-Argumente auf Gueltigkeit ueberpruefen
 			-Erstellen und Zurückgeben einer NEUEN Matrix mit genau den selben Parametern der gegebenen Matrix
 	*/
+
+	int size = sizeof(old->elements)/sizeof(old->elements[0]);
+	struct matrix *new = old;
+	for (int i = 0; i <12; i++){
+		printf("%d", new->elements[i]);
+	}
+	printf("%d\n", size);
 	
-	return NULL;
+	return new;
 }
 
 void add_matrix(matrix* a, matrix* b)
@@ -48,8 +70,13 @@ void add_matrix(matrix* a, matrix* b)
 			-Argumente auf Gueltigkeit ueberpruefen
 			-Elementweises Addieren von a und b (a+b)
 	*/
-
-}
+	int size = sizeof(a->elements)/sizeof(a->elements[0]);
+	for (int i = 0; i <12; i++){
+		a->elements[i] + b->elements[i];
+	}
+	printf("%d\n", size);
+	
+}	
 
 void subtract_matrix(matrix* a, matrix* b)
 {
@@ -57,7 +84,11 @@ void subtract_matrix(matrix* a, matrix* b)
 			-Argumente auf Gueltigkeit ueberpruefen
 			-Elementweises Subtrahieren von a und b (a-b)
 	*/
-	
+	int size = sizeof(a->elements)/sizeof(a->elements[0]);
+	for (int i = 0; i <12; i++){
+		a->elements[i] - b->elements[i];
+	}
+	printf("%d\n", size);
 }
 
 int get_elem_of_matrix(matrix* matrix, unsigned int i, unsigned int j)
@@ -66,8 +97,7 @@ int get_elem_of_matrix(matrix* matrix, unsigned int i, unsigned int j)
 		-Argumente auf Gueltigkeit ueberpruefen
 		-Rueckgabe des Elements an den Indizes i und j	
 	*/
-	
-	return 0;
+	return matrix->elements[i*j];
 }
 
 int check_matrix_elements(matrix* matrix)
@@ -79,8 +109,18 @@ int check_matrix_elements(matrix* matrix)
 			->wenn alle Elemente 0 sind, soll 0 zurückgegeben werden
 			->ansonsten soll 1 zurückgegeben werden
 	*/
-
-	return 0;
+	int check = 0;
+	int size = sizeof(matrix->elements)/sizeof(matrix->elements[0]);
+	for (int i = 0; i <12; i++){
+		if (matrix->elements[i] <0){
+			return -1;
+		}
+		else if (matrix->elements[i] > 0){
+			check = 1;
+		}
+	}
+	printf("%d\n", size);
+	return check;
 }
 
 matrix* get_row_from_matrix(matrix* mat, unsigned int m)
@@ -89,7 +129,7 @@ matrix* get_row_from_matrix(matrix* mat, unsigned int m)
 			-Argumente auf Gueltigkeit ueberpruefen
 			-Rueckgabe der m-ten Zeile der Matrix (Die Zeile selbst ist auch wieder eine Matrix mit genau einer Zeile)
 	*/
-
+	matr
 	return NULL;
 
 }
