@@ -28,8 +28,16 @@ matrix* create_matrix_from_row(unsigned int m, unsigned int row_nr, matrix* row)
 			-Erstellen einer neuen Matrix (Initialisierung mit 0)
 			-Kopieren der gegebenen Zeile an die richtige Stelle
 	*/
+
+	// how to check if row matrix is really just one row??
 	
-	return NULL;
+	int size = sizeof(row)/ sizeof(row[0]);
+	struct matrix *zeros = malloc(sizeof(struct matrix)*m*4);	//alloc matrix array
+	memset(zeros, 0, m*4*sizeof(int));
+
+	zeros->elements[row_nr] = row->elements;
+	
+	return zeros;
 }
 
 void free_matrix(matrix* matrix)
@@ -129,8 +137,13 @@ matrix* get_row_from_matrix(matrix* mat, unsigned int m)
 			-Argumente auf Gueltigkeit ueberpruefen
 			-Rueckgabe der m-ten Zeile der Matrix (Die Zeile selbst ist auch wieder eine Matrix mit genau einer Zeile)
 	*/
-	matr
-	return NULL;
+	struct matrix * row;
+	row->elements = mat->elements[m];
+	for (int i = 0; i <3; i++){
+		row->elements[i];
+	}
+
+	return row;
 
 }
 
