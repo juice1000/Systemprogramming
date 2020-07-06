@@ -2,13 +2,20 @@
 
 matrix* create_matrix(unsigned int m, unsigned int n, int* numbers)
 {
-	struct matrix *matrix = malloc(sizeof(struct matrix)*n*m);
-
-	matrix->m = m;
-	matrix->n = n;
-	matrix->elements = malloc(sizeof(int)*m*n);
-	for (int i = 0; i < n*m; i++){
-		matrix->elements[i] = numbers[i];
+	matrix *mat = (matrix*)malloc(sizeof(matrix));
+	int size = n*m;
+	for (int i = 0; i <size; i++){ // Alles checken!
+		if (numbers[i] <0){
+			printf("negative values!\n");
+			return NULL;
+		}
+	}
+	
+	mat->m = m;
+	mat->n = n;
+	mat->elements = malloc(sizeof(int)*m*n);
+	for (int i = 0; i < size; i++){
+		mat->elements[i] = numbers[i];
 	}
 
 	/*TODO:
@@ -18,7 +25,7 @@ matrix* create_matrix(unsigned int m, unsigned int n, int* numbers)
 			  Dies ist für die automatischen Tests unerlaesslich)
 	*/
 
-	return matrix;
+	return mat;
 }
 
 matrix* create_matrix_from_row(unsigned int m, unsigned int row_nr, matrix* row)
@@ -28,15 +35,35 @@ matrix* create_matrix_from_row(unsigned int m, unsigned int row_nr, matrix* row)
 			-Erstellen einer neuen Matrix (Initialisierung mit 0)
 			-Kopieren der gegebenen Zeile an die richtige Stelle
 	*/
-
+	
 	// how to check if row matrix is really just one row??
-	
-	int size = sizeof(row)/ sizeof(row[0]);
-	struct matrix *zeros = malloc(sizeof(struct matrix)*m*4);	//alloc matrix array
-	memset(zeros, 0, m*4*sizeof(int));
+	if (row == NULL){
+		printf("Given matrix is empty\n");
+		return NULL;
+	}
 
-	zeros->elements[row_nr] = row->elements;
-	
+	matrix* zeros = (matrix*)malloc(sizeof(matrix));	//alloc matrix array
+	zeros->m = m;
+	zeros->n = row->n;
+	zeros->elements = malloc(sizeof(int)*m*zeros->n);
+	memset(zeros->elements, 0, m*row->n*sizeof(int));
+	int size_zeros = zeros->m * row->n;
+	int row_count = 0;
+
+	for(int i = 0; i<size_zeros; i++){
+
+		if (i % row->n == 0 && i != 0){
+			row_count++;
+		}
+		if (row_count == row_nr){
+			for (int j = 0; j < row->n; j++){
+				zeros->elements[i] = row->elements[j];
+				i++;
+			}
+			break;
+		}
+		
+	}
 	return zeros;
 }
 
@@ -46,12 +73,10 @@ void free_matrix(matrix* matrix)
 			-Argumente auf Gueltigkeit ueberpruefen
 			-Matrix und alle dynamisch reservierten elemente der Matrix freigeben
 	*/	
-
-	//free(matrix->elements); --> gives segmentation fault
-	//int size = sizeof(matrix->elements)/sizeof(int);
-	//for (int i = 0; i <size; i++){
-	//	free(matrix->elements[i]);
-	//}
+	if(matrix == NULL){
+		return;
+	}
+	free(matrix->elements);
 	free(matrix);
 }
 
@@ -61,13 +86,14 @@ matrix* duplicate_matrix(matrix* old)
 			-Argumente auf Gueltigkeit ueberpruefen
 			-Erstellen und Zurückgeben einer NEUEN Matrix mit genau den selben Parametern der gegebenen Matrix
 	*/
-
-	int size = sizeof(old->elements)/sizeof(old->elements[0]);
+	if(old == NULL){
+		return NULL;
+	}
+	int size = old->m * old->n;
 	struct matrix *new = old;
-	for (int i = 0; i <12; i++){
+	for (int i = 0; i <size; i++){
 		printf("%d", new->elements[i]);
 	}
-	printf("%d\n", size);
 	
 	return new;
 }
@@ -78,11 +104,15 @@ void add_matrix(matrix* a, matrix* b)
 			-Argumente auf Gueltigkeit ueberpruefen
 			-Elementweises Addieren von a und b (a+b)
 	*/
-	int size = sizeof(a->elements)/sizeof(a->elements[0]);
-	for (int i = 0; i <12; i++){
-		a->elements[i] + b->elements[i];
+	if (a == NULL || b == NULL){
+		printf("Given matrizes are empty\n");
+		return;
 	}
-	printf("%d\n", size);
+	int size = a->m * a->n;
+
+	for (int i = 0; i <size; i++){
+		a->elements[i] = a->elements[i] + b->elements[i];
+	}
 	
 }	
 
@@ -92,11 +122,14 @@ void subtract_matrix(matrix* a, matrix* b)
 			-Argumente auf Gueltigkeit ueberpruefen
 			-Elementweises Subtrahieren von a und b (a-b)
 	*/
-	int size = sizeof(a->elements)/sizeof(a->elements[0]);
-	for (int i = 0; i <12; i++){
-		a->elements[i] - b->elements[i];
+	if (a == NULL || b == NULL){
+		printf("Given matrizes are empty\n");
+		return;
 	}
-	printf("%d\n", size);
+	int size = a->m * a->n;
+	for (int i = 0; i <size; i++){
+		a->elements[i] = a->elements[i] - b->elements[i];
+	}
 }
 
 int get_elem_of_matrix(matrix* matrix, unsigned int i, unsigned int j)
@@ -105,7 +138,32 @@ int get_elem_of_matrix(matrix* matrix, unsigned int i, unsigned int j)
 		-Argumente auf Gueltigkeit ueberpruefen
 		-Rueckgabe des Elements an den Indizes i und j	
 	*/
-	return matrix->elements[i*j];
+	if (i > matrix->m || i<0 || j<0 || j>matrix->n){
+		printf("Out of bounds");
+		return -1;
+	}
+	int size = matrix->m * matrix->n;
+	int row_count = 0;
+	int col_count = 0;
+	for (int k = 0; k < size; k++){
+		
+		if(k % matrix->n == 0 && k != 0){
+			row_count++;
+			col_count = 0;
+		}
+		if(row_count == i){
+			for (int z = 0; z < matrix->n; z++){
+				if(col_count == j){
+					return matrix->elements[k];
+				}	
+				k++;
+				col_count++;
+			}			
+		}
+		col_count++;
+	}
+	
+	return -1;
 }
 
 int check_matrix_elements(matrix* matrix)
@@ -117,9 +175,12 @@ int check_matrix_elements(matrix* matrix)
 			->wenn alle Elemente 0 sind, soll 0 zurückgegeben werden
 			->ansonsten soll 1 zurückgegeben werden
 	*/
+	if(matrix == NULL){
+		return -1;
+	}
 	int check = 0;
-	int size = sizeof(matrix->elements)/sizeof(matrix->elements[0]);
-	for (int i = 0; i <12; i++){
+	int size = matrix->m * matrix->n;
+	for (int i = 0; i <size; i++){
 		if (matrix->elements[i] <0){
 			return -1;
 		}
@@ -127,7 +188,6 @@ int check_matrix_elements(matrix* matrix)
 			check = 1;
 		}
 	}
-	printf("%d\n", size);
 	return check;
 }
 
@@ -137,12 +197,30 @@ matrix* get_row_from_matrix(matrix* mat, unsigned int m)
 			-Argumente auf Gueltigkeit ueberpruefen
 			-Rueckgabe der m-ten Zeile der Matrix (Die Zeile selbst ist auch wieder eine Matrix mit genau einer Zeile)
 	*/
-	struct matrix * row;
-	row->elements = mat->elements[m];
-	for (int i = 0; i <3; i++){
-		row->elements[i];
+	if(mat == NULL || m < 0 || m > mat->m){
+		return NULL;
 	}
 
+	matrix * row = (matrix*)malloc(sizeof(matrix));
+	row->m = 1;
+	row->n = mat->n;
+	row->elements = malloc(sizeof(int)*mat->n);
+	memset(mat->elements, 0, mat->n*sizeof(int));
+	int size = mat->n * mat->m;
+	int row_count = 0;
+	for(int i = 0; i<size; i++){
+		if (i % mat->n == 0 && i != 0){
+			row_count++;
+		}
+		if (row_count == m){
+			for (int j = 0; j < row->n; j++){
+				row->elements[j] = mat->elements[i];
+				i++;
+			}
+			break;
+		}
+		
+	}
 	return row;
 
 }
