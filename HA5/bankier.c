@@ -68,7 +68,6 @@ int check_allocation(matrix* B, matrix* R, matrix* f, matrix* allocation, unsign
 				B->elements[i] = B->elements[i] + allocation->elements[j];
 				
 				if(f->elements[j] < 0){
-					free_matrix(tmp);
 					return 0;
 				}
 				i++;
