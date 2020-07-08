@@ -45,8 +45,7 @@ matrix* create_matrix_from_row(unsigned int m, unsigned int row_nr, matrix* row)
 	matrix* zeros = (matrix*)malloc(sizeof(matrix));	//alloc matrix array
 	zeros->m = m;
 	zeros->n = row->n;
-	zeros->elements = malloc(sizeof(int)*m*zeros->n);
-	memset(zeros->elements, 0, m*row->n*sizeof(int));
+	zeros->elements = calloc(1, sizeof(int)*m*zeros->n);
 	int size_zeros = zeros->m * row->n;
 	int row_count = 0;
 
@@ -197,6 +196,7 @@ matrix* get_row_from_matrix(matrix* mat, unsigned int m)
 			-Argumente auf Gueltigkeit ueberpruefen
 			-Rueckgabe der m-ten Zeile der Matrix (Die Zeile selbst ist auch wieder eine Matrix mit genau einer Zeile)
 	*/
+
 	if(mat == NULL || m < 0 || m > mat->m){
 		return NULL;
 	}
@@ -204,8 +204,7 @@ matrix* get_row_from_matrix(matrix* mat, unsigned int m)
 	matrix * row = (matrix*)malloc(sizeof(matrix));
 	row->m = 1;
 	row->n = mat->n;
-	row->elements = malloc(sizeof(int)*mat->n);
-	memset(mat->elements, 0, mat->n*sizeof(int));
+	row->elements = calloc(1, sizeof(int)*mat->n);
 	int size = mat->n * mat->m;
 	int row_count = 0;
 	for(int i = 0; i<size; i++){
@@ -213,6 +212,7 @@ matrix* get_row_from_matrix(matrix* mat, unsigned int m)
 			row_count++;
 		}
 		if (row_count == m){
+			
 			for (int j = 0; j < row->n; j++){
 				row->elements[j] = mat->elements[i];
 				i++;
