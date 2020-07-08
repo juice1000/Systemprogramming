@@ -88,11 +88,7 @@ matrix* duplicate_matrix(matrix* old)
 	if(old == NULL){
 		return NULL;
 	}
-	int size = old->m * old->n;
-	struct matrix *new = old;
-	for (int i = 0; i <size; i++){
-		printf("%d", new->elements[i]);
-	}
+	matrix *new = create_matrix(old->m, old->n, old->elements);
 	
 	return new;
 }

@@ -8,8 +8,26 @@ int check_initial_state(matrix* f, matrix* G)
 	
 			Muss nicht extra aufgerufen werden, das übernimmt die main()
 	*/
+	int size = G->m * G->n;
+	int row_count = 0;
+	matrix* tmp = duplicate_matrix(G);
+	int i = 0;
+	while(i < size){
+		for(int j = 0; j < tmp->n; j++){
+			tmp->elements[i] = tmp->elements[i] - f->elements[j];
+			if(tmp->elements[i] > 0){
+				return 0;
+			}
+			i++;
+		}
+		row_count++;
 
-	return 0;
+		
+	}
+
+	free_matrix(tmp);
+
+	return 1;
 }
 
 int check_allocation(matrix* B, matrix* R, matrix* f, matrix* allocation, unsigned int ID)
@@ -23,8 +41,44 @@ int check_allocation(matrix* B, matrix* R, matrix* f, matrix* allocation, unsign
 			->Ansonsten den Prozess "blockieren" (0 zurückgeben. Das Blockieren wird dann von der main() übernommen)
 			-Erinnerung: dynamisch reservierter Speicher muss wieder freigegeben werden!
 	*/
+	//check_initial_state(f, R);
+	matrix* tmp = duplicate_matrix(f);
+	int size = R->m * R->n;
+	for(int i = 0; i <tmp->n; i++){
+		tmp->elements[i] = tmp->elements[i] - allocation->elements[i];
+		if(tmp->elements[i] < 0){
+			free_matrix(tmp);
+			return 0;
+		}
+		i++;
 
-	return 0;
+	}
+
+	free_matrix(tmp);
+	int row_count = 0;
+
+	for(int i = 0; i <size; i++){
+		if(i % R->n == 0 && i != 0){
+			row_count++;
+		}
+		if(row_count == ID){
+			for(int j = 0; j < f->n; j++){
+				f->elements[j] = f->elements[j] - allocation->elements[j];
+				R->elements[i] = R->elements[i] - allocation->elements[j];
+				B->elements[i] = B->elements[i] + allocation->elements[j];
+				
+				if(f->elements[j] < 0){
+					free_matrix(tmp);
+					return 0;
+				}
+				i++;
+			}
+			break;
+		}
+	}
+
+
+	return (check_state(B,R,f));
 }
 
 int check_state(matrix* B, matrix* R, matrix* f)
@@ -32,8 +86,21 @@ int check_state(matrix* B, matrix* R, matrix* f)
 	/*TODO:
 			-Bankieralgorithmus implementieren
 	*/
+	int size = B->m * B->n;
+	int row_size = f->n;
 
-	return -1;
+	for(int i = 0; i<size; i++){
+		if(B->elements[i] < 0 || R->elements[i] < 0){
+			return 0;
+		}
+	}
+
+	for(int i = 0; i < row_size; i++){
+		if(f->elements[i] < 0){
+			return 0;
+		}
+	}
+	return 1;
 }
 
 //===============================================================================
