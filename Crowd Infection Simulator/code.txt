@@ -1,0 +1,56 @@
+Global:
+char buffer[1024];
+
+state s = gather;          // Werte: ’gather’ oder ’copy_data’
+Mutex buffer_m;
+Mutex s_m;
+signal calc_ready; 
+signal gather_ready_s;
+
+Sensor-Thread:
+while(1) {
+	lock(buffer_m);
+	lock(s_m);
+
+	while (s == gather){
+		gatherData(&buffer);
+		s = copy_data;
+		signal (gather_ready_s);
+		
+	}
+	
+	while (s != gather){
+		unlock(buffer_m);
+		unlock(s_m);
+		wait(calc_ready);
+		lock(buffer-m);
+		lock(s_m);
+	}
+
+}
+
+Berechnungs-Thread:
+while(1) {
+	
+	char internal_buffer[1024];
+	lock(buffer_m);
+	lock(s_m);
+
+	while(s != copy_data || *buffer != Null){
+		unlock(buffer_m);
+		unlock(s_m);
+		wait(gather_ready_s);
+		lock(buffer_m);
+		lock(s_m);
+
+	}
+
+	while(s == copy_data){
+		memcpy(internal_buffer,buffer,1024);
+		s = gather;
+		signal(calc_ready);
+		unlock(buffer_m);
+		unlock(s_m);
+		calculate_forecast(internal_buffer);
+	}
+
