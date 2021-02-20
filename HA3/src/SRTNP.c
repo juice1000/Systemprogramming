@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
+// THIS SCRIPT WAS DEVELOPED BY JULIEN LOOK
 
 process* SRTNP_tick (process* running_process){
     if (running_process==NULL || running_process->time_left==0){

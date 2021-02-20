@@ -1,5 +1,6 @@
 #include "../lib/LCFS.h"
 
+// THIS SCRIPT WAS DEVELOPED BY JULIEN LOOK
 
 int LCFS_startup(){
     LCFS_queue=new_queue();
