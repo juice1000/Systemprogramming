@@ -1,5 +1,8 @@
 #include "prio_q.h"
 
+// THIS SCRIPT WAS DEVELOPED BY JULIEN LOOK
+
+
 struct prio_q * prio_q_create() 
 {
 	struct prio_q * q = malloc(sizeof(struct prio_q)); //Pointer q to initialized priority queue and allocates enough memory for it.
