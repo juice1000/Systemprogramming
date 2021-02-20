@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+// THIS SCRIPT WAS DEVELOPED BY JULIEN LOOK
 
 process* HRRN_tick (process* running_process){
     update_HRRN(HRRN_queue);

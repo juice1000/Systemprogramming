@@ -3,7 +3,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-//TODO: Fehlerbehandlung
+// THIS SCRIPT WAS DEVELOPED BY JULIEN LOOK
+
 int queue_add(void* new_obejct, queue_object* queue){
     queue_object* new_queue_object= calloc(1,sizeof(queue_object));
     if (new_queue_object==NULL){
