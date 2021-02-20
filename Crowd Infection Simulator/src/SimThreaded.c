@@ -6,6 +6,8 @@
  * 
  */
 
+// THIS SCRIPT WAS DEVELOPED BY JULIEN LOOK
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -40,16 +42,12 @@ struct Sim
 
 	State states[SCENARIO_NUM];  // each scenario's state variable
 
-	// TODO BEGIN
-	// A) Create variable to store thread reference
 	pthread_t scn_thread[SCENARIO_NUM];
 
-	// C) Create mutex and signal variables for synchronisation
 	pthread_cond_t new_sim_cond[SCENARIO_NUM]; // signal for new state
 	pthread_cond_t done_cond[SCENARIO_NUM]; // signal for finished iteration
 	pthread_mutex_t new_sim_mutex[SCENARIO_NUM];
 
-	// TODO END
 };
 
 /////////////////////////////////
@@ -215,9 +213,7 @@ static void Sim_ArgsInit(Args *args, int iteration_num, int argc, char **argv)
 
 static void Sim_CalcActiveIteration(Sim *sim)
 {
-	// TODO BEGIN
-	// D) Implement this function: Invoke the scenario threads
-	//    Wait for scenario threads to finish one iteration.
+
 	for (int i=0; i<SCENARIO_NUM; i++){
 		pthread_mutex_lock(sim->args[i].new_sim_mutex);
 
@@ -237,20 +233,16 @@ static void Sim_CalcActiveIteration(Sim *sim)
 		pthread_mutex_unlock(sim->args[i].new_sim_mutex);
 		
 	}
-	
-	// TODO END
+
 }
 
 static void Sim_Cleanup(Sim *sim)
 {
-	// TODO BEGIN
 
-	// A) Wait for threads to end
 	for (int i = 0; i < SCENARIO_NUM; i++){
         pthread_join(sim->scn_thread[i], NULL);
 	}
 
-	// C) Handle mutexes and signals!
 	for (int i = 0; i < SCENARIO_NUM; i++){
         pthread_mutex_destroy(&sim->new_sim_mutex[i]);
 		pthread_cond_destroy(&sim->new_sim_cond[i]);
@@ -261,8 +253,6 @@ static void Sim_Cleanup(Sim *sim)
         Scenario_DataDestroy(sim->s[i]);
 	}
 	
-
-	// TODO END
 	
 	#ifdef GUI_MODE
 		GUI_Destroy(sim->gui);
@@ -312,9 +302,6 @@ static void Sim_CLIParseSim(Sim *sim, int argc, char **argv)
 static void Sim_End(Sim *sim)
 {
 	sim->running = false;
-	// TODO BEGIN
-	// D) Implement this function: Invoke the scenario threads
-	//    Wait for scenario threads to finish one iteration.
 
 	for (int i = 0; i < SCENARIO_NUM; i++){
 		pthread_mutex_lock(&sim->new_sim_mutex[i]);
@@ -322,7 +309,6 @@ static void Sim_End(Sim *sim)
 		pthread_cond_signal(&sim->new_sim_cond[i]);
 		pthread_mutex_unlock(&sim->new_sim_mutex[i]);
 	}
-	// TODO END
 }
 
 static UserInput Sim_GetUserInput(__attribute__((unused)) Sim *sim)
@@ -360,10 +346,9 @@ static void Sim_Init(Sim *sim, int argc, char **argv)
 
 	for (i = 0; i < SCENARIO_NUM; i++)
 	{
-		// TODO BEGIN
+
 		sim->states[i] = WAITING;
 		sim->args[i].state = &sim->states[i];
-		// C) Handle mutexe and signals
 		pthread_mutex_init(&sim->new_sim_mutex[i], NULL);
 		pthread_cond_init(&sim->new_sim_cond[i], NULL);
 		pthread_cond_init(&sim->done_cond[i], NULL);
@@ -371,7 +356,6 @@ static void Sim_Init(Sim *sim, int argc, char **argv)
 		sim->args[i].new_sim_cond = &sim->new_sim_cond[i];
 		sim->args[i].done_cond = &sim->done_cond[i];
 
-		// A) Start threads, save reference in sim
 		sim->s[i] = Scenario_Create(&sim->args[i]); // create scenario and assign to state variables
 		pthread_create(&sim->scn_thread[i], NULL, Scenario_Main, sim->s[i]); //pass state variables to scenario main function and call scenario main
 		

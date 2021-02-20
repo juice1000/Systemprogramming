@@ -32,6 +32,7 @@ int* blocked_processes;	//array to hold information about the status of all proc
 						// 1 = process blocked
 
 
+// THIS FUNCTION WAS DEVELOPED BY JULIEN LOOK
 int retrieve_data_from_file(char* file_path)
 {
 	if((data = read_data(file_path))== NULL)	//reads all the data from the given file and returns it within a struct

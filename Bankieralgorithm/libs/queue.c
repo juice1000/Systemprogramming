@@ -1,5 +1,7 @@
 #include "queue.h"
 
+// THIS SCRIPT WAS DEVELOPED BY JULIEN LOOK
+
 node* create_node(void* data, unsigned int size)
 {
 	node* new = (node*)malloc(sizeof(node));
