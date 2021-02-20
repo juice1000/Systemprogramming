@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 
+// THIS SCRIPT WAS DEVELOPED BY JULIEN LOOK
 
 process* PRIOP_tick (process* running_process){
     if (running_process==NULL || running_process->time_left==0){

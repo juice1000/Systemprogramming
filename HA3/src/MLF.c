@@ -1,6 +1,7 @@
 #include "../lib/MLF.h"
 
 
+// THIS SCRIPT WAS DEVELOPED BY JULIEN LOOK
 
 int MLF_startup(){
 
