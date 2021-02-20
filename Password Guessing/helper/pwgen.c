@@ -1,5 +1,6 @@
 #include "pwgen.h"
 
+// THIS SCRIPT WAS DEVELOPED BY JULIEN LOOK
 int next_pwd_internal(char *shifted_buffer, int remaining_buff_size);
 
 pwd *new_password(int maxlen) {
