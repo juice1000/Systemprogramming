@@ -1,6 +1,8 @@
 #include "bruteforcer.h"
 #include <unistd.h>
 
+	// THIS SCRIPT WAS DEVELOPED BY JULIEN LOOK
+
 int main(int argc, char *argv[]) {
 	// Argumente checken
 	if (argc != 4) {
@@ -11,6 +13,7 @@ int main(int argc, char *argv[]) {
 	char *filename = NULL;
 	hashes *loaded_hashes = NULL;
 	
+
 	// Kommandozeilenargumente auslesen und globale und lokale Variablen füllen
 	pwd_maxlen = (int) strtol(argv[1], (char **)NULL, 10);
 	max_workers = (int) strtol(argv[2], (char **)NULL, 10);
