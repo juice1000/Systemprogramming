@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+// THIS SCRIPT WAS DEVELOPED BY JULIEN LOOK
 process* FCFS_tick (process* running_process){
     if (running_process==NULL || running_process->time_left==0){
         running_process=queue_poll(FCFS_queue);
